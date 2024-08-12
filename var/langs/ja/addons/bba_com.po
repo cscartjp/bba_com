@@ -1,0 +1,17 @@
+msgid ""
+msgstr "Project-Id-Version: tygh"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Language-Team: Japanese\n"
+"Language: ja_JP\n"
+
+msgctxt "LanguageName"
+msgid "Localized language name"
+msgstr "Japanese"
+
+msgctxt "Addons::name::bba_com"
+msgid "bba_com"
+msgstr "bba_com"
+
+msgctxt "Addons::description::bba_com"
+msgid "bba_com"
+msgstr "bba_com"
