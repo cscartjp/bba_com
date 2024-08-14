@@ -184,3 +184,11 @@ msgstr "タイムラインに投稿しよう！"
 msgctxt "Languages::bba_com.community_post_new"
 msgid "新規投稿"
 msgstr "新規投稿"
+
+msgctxt "Languages::bba_com.post_added"
+msgid "投稿しました"
+msgstr "投稿しました"
+
+msgctxt "Languages::bba_com.post_not_added"
+msgid "投稿に失敗しました"
+msgstr "投稿に失敗しました"
