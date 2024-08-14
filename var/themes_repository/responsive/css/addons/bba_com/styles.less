@@ -1,1 +1,291 @@
 //ここにスタイルを記述する
+
+.bba-profile-top {
+  display: flex;
+  align-items: center;
+  margin-bottom: 20px;
+
+  .bba-profile-image {
+    .bba-profile-image-photo {
+      //  画像をまるくする
+      border-radius: 50%;
+      //width: 100px;
+      //height: 100px;
+      margin-right: 20px;
+    }
+  }
+
+
+  .bba-profile-name {
+    flex-grow: 1;
+
+    .bba-profile-kana {
+      font-size: 0.8em;
+      line-height: 1em;
+    }
+
+    .bba-profile-fullname {
+      font-size: 1.5em;
+      line-height: 1.5em;
+      text-align: left;
+    }
+
+    .bba-profile-catch-copy {
+      font-size: 0.8em;
+      line-height: 1.2em;
+    }
+
+    .bba-bis-info {
+      display: inline-block;
+      padding: 10px;
+      //margin-top: 10px;
+      //margin-right: 10px;
+      border-radius: 5px;
+      background-color: #C3E9FAFF;
+
+      p {
+        font-size: 0.8em;
+        line-height: 0.8em;
+      }
+    }
+
+    .sns-link {
+      margin-top: 10px;
+
+      a:hover {
+        text-decoration: none;
+      }
+
+      i {
+        font-size: 3em;
+        margin-right: 10px;
+      }
+    }
+
+  }
+
+
+  .bba-profile-edit {
+    //flex-grow: 1;
+    a.bba-profile-edit-link {
+      font-size: 0.8em;
+    }
+  }
+}
+
+.bba-profile-info {
+  ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+
+    li {
+      border-bottom: 1px solid #ddd;
+      padding: 10px 0;
+      margin-right: 10px;
+      margin-bottom: 0;
+
+      .bba-profile-info-label {
+        display: block;
+        font-size: 0.7em;
+        //width: 100px;
+        //font-weight: bold;
+      }
+
+      .bba-profile-info-value {
+        display: block;
+
+        a {
+          font-size: 1em;
+        }
+      }
+    }
+  }
+}
+
+
+.bba-community-new-post {
+  padding: 0;
+  border: 2px solid #ddd;
+  border-radius: 15px;
+  margin-bottom: 40px;
+
+  .bba-community-new-post-header {
+    display: flex;
+    align-items: center;
+    padding: 10px;
+    background-color: #eee;
+
+    .bba-community-new-post-user-icon {
+      .bba-post-user-icon {
+        border-radius: 50%;
+        //width: 50px;
+        //height: 50px;
+        margin-right: 10px;
+      }
+    }
+
+    .bba-community-new-post-header-name {
+      flex-grow: 1;
+
+      h4 {
+        font-size: 1em;
+        line-height: 1em;
+        margin: 0;
+        font-weight: bold;
+      }
+
+      p {
+        font-size: 0.7em;
+        line-height: 0.7em;
+      }
+    }
+  }
+
+  .bba-community-new-post-body {
+    padding: 10px 20px 10px 30px;
+
+    .ty-control-group__title {
+      display: none;
+    }
+
+    textarea {
+      width: 100%;
+      height: 100px;
+      border: 1px solid #ddd;
+      border-radius: 5px;
+      padding: 5px;
+      font-size: 0.8em;
+    }
+  }
+
+  .bba-community-new-post-footer {
+    display: flex;
+    background-color: #efefef;
+    justify-content: flex-end;
+
+    .buttons-container {
+      background-color: inherit;
+
+      .ty-btn__secondary.bba-community-new-post-btn {
+        width: inherit !important;
+        margin-bottom: 0;
+      }
+    }
+  }
+
+}
+
+
+.bba-community-posts {
+  .bba-community-post {
+    margin-bottom: 40px;
+    padding: 0;
+    border: 2px solid #ddd;
+    border-radius: 15px;
+
+    .bba-community-post-header {
+      display: flex;
+      align-items: center;
+      padding: 10px;
+      background-color: #eee;
+
+      .bba-community-post-user-icon {
+        .bba-post-user-icon {
+          border-radius: 50%;
+          //width: 50px;
+          //height: 50px;
+          margin-right: 10px;
+        }
+      }
+
+      .bba-community-post-header-name {
+        flex-grow: 1;
+
+        h4 {
+          font-size: 1em;
+          line-height: 1em;
+          margin: 0;
+          font-weight: bold;
+        }
+
+        p {
+          font-size: 0.7em;
+          line-height: 0.7em;
+        }
+      }
+    }
+
+    .bba-community-post-body {
+      //margin-top: 10px;
+      //margin-bottom: 10px;
+      padding: 20px 20px 30px;
+
+
+      .bba-community-post-ogp-info {
+        padding: 10px;
+        border: 1px solid #ddd;
+        margin-bottom: 10px;
+        background-color: #f9f9f9;
+        box-shadow: 0 0 5px rgba(0, 0, 0, 0.5);
+
+        a {
+          display: block;
+          text-decoration: none;
+
+          .bba-community-post-ogp-image {
+            display: block;
+            width: 100%;
+            height: auto;
+            margin-bottom: 10px;
+
+          }
+
+          .bba-community-ogp-title {
+            font-size: 0.9em;
+            line-height: 1.2em;
+            font-weight: bold;
+            //margin-bottom: 10px;
+          }
+
+          .bba-community-ogp-description {
+            font-size: 0.8em;
+            line-height: 1.4em;
+            //margin-bottom: 10px;
+          }
+        }
+
+        a:hover {
+          text-decoration: none;
+        }
+      }
+
+
+      .bba-community-post-article,
+      .bba-community-post-article a {
+        font-size: 14px;
+        line-height: 2em;
+        letter-spacing: 0.2em;
+        word-break: break-all;
+      }
+    }
+
+    .bba-community-post-footer {
+      display: flex;
+      justify-content: flex-end;
+      align-items: center;
+      padding: 10px;
+      background-color: #efefef;
+
+      .bba-community-post-footer-like,
+      .bba-community-post-footer-comment {
+        padding-left: 10px;
+
+        span {
+          margin-left: 5px;
+          font-size: 0.8em;
+        }
+      }
+    }
+  }
+}

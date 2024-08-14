@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <addon scheme="3.0">
     <id>bba_com</id>
-    <version>0.0.2</version>
+    <version>0.0.3</version>
     <priority>70000</priority>
     <position>0</position>
     <status>active</status>
@@ -71,18 +71,21 @@
         <!--        </item>-->
         <!--        <item for="uninstall">DROP TABLE IF EXISTS ?:business_categories;</item>-->
 
-        <!--ショップ地域マスター -->
-        <!--        <item>DROP TABLE IF EXISTS ?:store_regions;</item>-->
+        <!--タイムライン投稿内容 -->
+        <!--        <item>DROP TABLE IF EXISTS ?:community_user_posts;</item>-->
         <!--        <item>-->
-        <!--            CREATE TABLE `?:store_regions` (-->
-        <!--            `store_region_id` mediumint(8) UNSIGNED NOT NULL AUTO_INCREMENT,-->
-        <!--            `region` varchar(64) NOT NULL,-->
-        <!--            `position` mediumint(8) NOT NULL DEFAULT '0',-->
+        <!--            CREATE TABLE `?:community_user_posts` (-->
+        <!--            `post_id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT,-->
+        <!--            `parent_id` int(11) UNSIGNED NOT NULL DEFAULT '0',-->
+        <!--            `user_id` mediumint(8) UNSIGNED NOT NULL,-->
+        <!--            `post_type` char(1) NOT NULL DEFAULT 'T',-->
+        <!--            `article` text NOT NULL,-->
+        <!--            `timestamp` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',-->
         <!--            `status` char(1) NOT NULL DEFAULT 'A',-->
-        <!--            PRIMARY KEY (`store_region_id`)-->
+        <!--            PRIMARY KEY (`post_id`)-->
         <!--            ) ENGINE=MyISAM DEFAULT CHARSET UTF8;-->
         <!--        </item>-->
-        <!--        <item for="uninstall">DROP TABLE IF EXISTS ?:store_regions;</item>-->
+        <!--        <item for="uninstall">DROP TABLE IF EXISTS ?:community_user_posts;</item>-->
 
 
         <!--営業時間-->

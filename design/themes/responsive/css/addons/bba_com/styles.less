@@ -219,11 +219,54 @@
     .bba-community-post-body {
       //margin-top: 10px;
       //margin-bottom: 10px;
-      padding: 10px 20px 10px 30px;
+      padding: 20px 20px 30px;
 
-      p {
-        font-size: 0.8em;
-        line-height: 1.5em;
+
+      .bba-community-post-ogp-info {
+        padding: 10px;
+        border: 1px solid #ddd;
+        margin-bottom: 10px;
+        background-color: #f9f9f9;
+        box-shadow: 0 0 5px rgba(0, 0, 0, 0.5);
+
+        a {
+          display: block;
+          text-decoration: none;
+
+          .bba-community-post-ogp-image {
+            display: block;
+            width: 100%;
+            height: auto;
+            margin-bottom: 10px;
+
+          }
+
+          .bba-community-ogp-title {
+            font-size: 0.9em;
+            line-height: 1.2em;
+            font-weight: bold;
+            //margin-bottom: 10px;
+          }
+
+          .bba-community-ogp-description {
+            font-size: 0.8em;
+            line-height: 1.4em;
+            //margin-bottom: 10px;
+          }
+        }
+
+        a:hover {
+          text-decoration: none;
+        }
+      }
+
+
+      .bba-community-post-article,
+      .bba-community-post-article a {
+        font-size: 14px;
+        line-height: 2em;
+        letter-spacing: 0.2em;
+        word-break: break-all;
       }
     }
 

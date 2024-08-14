@@ -8,6 +8,7 @@
  */
 
 use Tygh\Registry;
+use Tygh\Tools\SecurityHelper;
 
 if (!defined('BOOTSTRAP')) {
     die('Access denied');
@@ -29,10 +30,39 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     //add_new_post
     if ($mode === 'add_new_post') {
 
-        if (defined('DEVELOPMENT')) {
-            fn_lcjp_dev_notify([
-                $_REQUEST
-            ]);
+
+//        CREATE TABLE `?:community_user_posts` (
+//        `post_id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT,
+//        `parent_id` int(11) UNSIGNED NOT NULL DEFAULT '0',
+//        `user_id` mediumint(8) UNSIGNED NOT NULL,
+//        `post_type` char(1) NOT NULL DEFAULT 'T',
+//        `article` text NOT NULL,
+//        `timestamp` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
+//        `status` char(1) NOT NULL DEFAULT 'A',
+//        PRIMARY KEY (`post_id`)
+//        ) ENGINE=MyISAM DEFAULT CHARSET UTF8;
+
+        $user_post_data = $_REQUEST['new_post'];
+        $_post_data = [
+            'user_id' => $auth['user_id'],
+            'article' => $user_post_data['article'],
+            'timestamp' => date('Y-m-d H:i:s'),
+        ];
+
+
+        //データのサニタイズ
+        SecurityHelper::sanitizeObjectData('newsletter', $_post_data);
+
+        //データベースに保存
+        /** @noinspection PhpUndefinedFunctionInspection */
+        $post_id = db_query("INSERT INTO ?:community_user_posts ?e", $_post_data);
+
+        if ($post_id) {
+            /** @noinspection PhpUndefinedFunctionInspection */
+            fn_set_notification('N', __('notice'), __('bba_com.post_added'));
+        } else {
+            /** @noinspection PhpUndefinedFunctionInspection */
+            fn_set_notification('E', __('error'), __('bba_com.post_not_added'));
         }
 
         $redirect_url = $_REQUEST['redirect_url'] ?? 'community.index';
@@ -45,6 +75,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
 //community.my_profile
 if ($mode === 'my_profile') {
+
+    $params = $_REQUEST;
 
     //ログインしていない場合はログインページへ
     if (empty($auth['user_id'])) {
@@ -73,6 +105,24 @@ if ($mode === 'my_profile') {
 
         Tygh::$app['view']->assign('cp_data', $cp_data);
     }
+
+
+    //ユーザーポスト(タイムライン)を取得
+    $params['user_id'] = $auth['user_id'];//ログインユーザーのID
+    $params['post_type'] = 'T';//T: タイムライン
+
+    [$user_posts, $search] = fn_bbcmm_get_user_posts($params, Registry::get('settings.Appearance.elements_per_page'));
+
+//    if (defined('DEVELOPMENT')) {
+//        fn_lcjp_dev_notify([
+//            $search,
+//            $posts,
+//        ]);
+//    }
+
+    Tygh::$app['view']->assign('user_posts', $user_posts);
+    Tygh::$app['view']->assign('search', $search);
+
 }
 
 //GET routineの場合は404
