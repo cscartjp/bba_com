@@ -15,3 +15,172 @@ msgstr "bba_com"
 msgctxt "Addons::description::bba_com"
 msgid "bba_com"
 msgstr "bba_com"
+
+
+msgctxt "Languages::bba_com.community_profile"
+msgid "コミュニティ・プロフィール"
+msgstr "コミュニティ・プロフィール"
+
+msgctxt "Languages::bba_com.community_profiles_settings"
+msgid "コミュニティ用プロフィール設定"
+msgstr "コミュニティ用プロフィール設定"
+
+msgctxt "Languages::bba_com.community_profiles_personal"
+msgid "個人情報"
+msgstr "個人情報"
+
+msgctxt "Languages::bba_com.community_profiles_settings_note"
+msgid "コミュニティページで表示されるプロフィール情報になります。"
+msgstr "コミュニティページで表示されるプロフィール情報になります。"
+
+msgctxt "Languages::bba_com.community_profiles_name"
+msgid "名前"
+msgstr "名前"
+
+msgctxt "Languages::bba_com.community_profiles_name_kana"
+msgid "名前（かな）"
+msgstr "名前（かな）"
+
+msgctxt "Languages::bba_com.community_profiles_company"
+msgid "会社情報"
+msgstr "会社情報"
+
+msgctxt "Languages::bba_com.community_profiles_company_name"
+msgid "会社名（屋号）"
+msgstr "会社名（屋号）"
+
+msgctxt "Languages::bba_com.community_profiles_company_position"
+msgid "役職"
+msgstr "役職"
+
+msgctxt "Languages::bba_com.community_profiles_company_postal_code"
+msgid "郵便番号"
+msgstr "郵便番号"
+
+msgctxt "Languages::bba_com.community_profiles_company_address"
+msgid "所在地"
+msgstr "所在地"
+
+msgctxt "Languages::bba_com.community_profiles_company_tel"
+msgid "電話番号"
+msgstr "電話番号"
+
+msgctxt "Languages::bba_com.community_profiles_company_fax"
+msgid "FAX番号"
+msgstr "FAX番号"
+
+msgctxt "Languages::bba_com.community_profiles_mobile_tel"
+msgid "携帯電話番号"
+msgstr "携帯電話番号"
+
+msgctxt "Languages::bba_com.community_profiles_business_category"
+msgid "業種"
+msgstr "業種"
+
+msgctxt "Languages::bba_com.community_profiles_business_content"
+msgid "事業内容"
+msgstr "事業内容"
+
+msgctxt "Languages::bba_com.community_profiles_company_established_date"
+msgid "設立年月日"
+msgstr "設立年月日"
+
+msgctxt "Languages::bba_com.community_profiles_company_capital"
+msgid "資本金"
+msgstr "資本金"
+
+msgctxt "Languages::bba_com.community_profiles_company_employees"
+msgid "社員数"
+msgstr "社員数"
+
+msgctxt "Languages::bba_com.community_profiles_catch_copy"
+msgid "キャッチコピー"
+msgstr "キャッチコピー"
+
+msgctxt "Languages::bba_com.community_profiles_bis_info"
+msgid "BS期⽣"
+msgstr "BS期⽣"
+
+msgctxt "Languages::bba_com.community_profiles_blog_sns"
+msgid "ブログ・SNS情報"
+msgstr "ブログ・SNS情報"
+
+msgctxt "Languages::bba_com.community_profiles_blog_start"
+msgid "ブログ開始日"
+msgstr "ブログ開始日"
+
+msgctxt "Languages::bba_com.community_profiles_blog_url"
+msgid "ブログURL"
+msgstr "ブログURL"
+
+msgctxt "Languages::bba_com.set_blog_url"
+msgid "ブログURLを設定してください。"
+msgstr "ブログURLを設定してください。"
+
+msgctxt "Languages::bba_com.blog_feed"
+msgid "ブログフィードURL"
+msgstr "ブログフィードURL"
+
+msgctxt "Languages::bba_com.community_profiles_company_url"
+msgid "会社ウェブサイトURL"
+msgstr "会社ウェブサイトURL"
+
+msgctxt "Languages::bba_com.community_profiles_facebook_url"
+msgid "Facebook URL"
+msgstr "Facebook URL"
+
+msgctxt "Languages::bba_com.community_profiles_x_url"
+msgid "X(Twitter) URL"
+msgstr "X(Twitter) URL"
+
+msgctxt "Languages::bba_com.community_profiles_instagram_url"
+msgid "Instagram URL"
+msgstr "Instagram URL"
+
+msgctxt "Languages::bba_com.community_profiles_youtube_url"
+msgid "YouTube URL"
+msgstr "YouTube URL"
+
+msgctxt "Languages::bba_com.community_profiles_my_profile"
+msgid "マイプロフィール（自由入力欄）"
+msgstr "マイプロフィール（自由入力欄）"
+
+msgctxt "Languages::bba_com.community_profile_image"
+msgid "プロフィール画像"
+msgstr "プロフィール画像"
+
+msgctxt "Languages::bba_com.community_images"
+msgid "追加画像"
+msgstr "追加画像"
+
+msgctxt "Languages::bba_com.preview_profile_page"
+msgid "プレビュー"
+msgstr "プレビュー"
+
+msgctxt "Languages::bba_com.community_index"
+msgid "コミュニティホーム"
+msgstr "コミュニティホーム"
+
+msgctxt "Languages::bba_com.community_my_profile"
+msgid "マイプロフィール"
+msgstr "マイプロフィール"
+
+msgctxt "Languages::bba_com.edit_profile"
+msgid "プロフィール編集"
+msgstr "プロフィール編集"
+
+msgctxt "Languages::bba_com.community_profiles_company_location"
+msgid "所在地"
+msgstr "所在地"
+
+msgctxt "Languages::bba_com.community_post_article"
+msgid "投稿内容"
+msgstr "投稿内容"
+
+msgctxt "Languages::bba_com.community_post_article_ph"
+msgid "タイムラインに投稿しよう！"
+msgstr "タイムラインに投稿しよう！"
+
+msgctxt "Languages::bba_com.community_post_new"
+msgid "新規投稿"
+msgstr "新規投稿"

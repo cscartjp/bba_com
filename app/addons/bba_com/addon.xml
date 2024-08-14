@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <addon scheme="3.0">
     <id>bba_com</id>
-    <version>0.0.1</version>
+    <version>0.0.2</version>
     <priority>70000</priority>
     <position>0</position>
     <status>active</status>
@@ -22,59 +22,54 @@
         <core_edition>MULTIVENDOR</core_edition>
     </compatibility>
     <queries>
-        <!--コミュニティ用のプロフィール-->
-        <item>DROP TABLE IF EXISTS ?:community_profiles;</item>
-        <item>
-            CREATE TABLE `?:community_profiles` (
-            `user_id` mediumint(8) UNSIGNED NOT NULL,
-            `name` varchar(64) NOT NULL DEFAULT '',
-            `name_kana` varchar(64) NOT NULL DEFAULT '',
-            `company_name` varchar(64) NOT NULL DEFAULT '',
-            `company_position` varchar(64) NOT NULL DEFAULT '' comment '役職',
-            `company_postal_code` varchar(8) NOT NULL DEFAULT '',
-            `company_address` varchar(128) NOT NULL DEFAULT '',
-            `company_tel` varchar(16) NOT NULL DEFAULT '',
-            `company_fax` varchar(16) NOT NULL DEFAULT '',
-            `mobile_tel` varchar(16) NOT NULL DEFAULT '',
-            `email` varchar(128) NOT NULL DEFAULT '',
-            'business_category_id' mediumint(8) DEFAULT '0' comment '業種ID',
-            <!--事業内容-->
-            `business_content` text NOT NULL DEFAULT '' comment '事業内容',
-            <!--設立年月日-->
-            `company_established_date` date NOT NULL DEFAULT '0000-00-00',
-            <!--資本金-->
-            `company_capital` varchar(16) NOT NULL DEFAULT '',
-            <!--社員数-->
-            `company_employees` varchar(16) NOT NULL DEFAULT '',
-            `catch_copy` text NOT NULL DEFAULT '',
-            `bis_info` varchar(128) NOT NULL DEFAULT '',
-            `blog_start` date NOT NULL DEFAULT '0000-00-00',
-            `blog_url` varchar(128) NOT NULL DEFAULT '',
-            `company_url` varchar(128) NOT NULL DEFAULT '',
-            `facebook_url` varchar(128) NOT NULL DEFAULT '',
-            `x_url` varchar(128) NOT NULL DEFAULT '',
-            `instagram_url` varchar(128) NOT NULL DEFAULT '',
-            `youtube_url` varchar(128) NOT NULL DEFAULT '',
-            <!--プロフィール自由記入欄-->
-            `my_profile` text NOT NULL DEFAULT '',
-            `status` char(1) NOT NULL DEFAULT 'A',
-            PRIMARY KEY (`user_id`)
-            ) ENGINE=MyISAM DEFAULT CHARSET UTF8;
-        </item>
-        <item for="uninstall">DROP TABLE IF EXISTS ?:community_profiles;</item>
+        <!--        &lt;!&ndash;コミュニティ用のプロフィール&ndash;&gt;-->
+        <!--        <item>DROP TABLE IF EXISTS ?:community_profiles;</item>-->
+        <!--        <item>-->
+        <!--            CREATE TABLE `?:community_profiles` (-->
+        <!--            `user_id` mediumint(8) UNSIGNED NOT NULL,-->
+        <!--            `name` varchar(64) NOT NULL DEFAULT '',-->
+        <!--            `name_kana` varchar(64) NOT NULL DEFAULT '',-->
+        <!--            `company_name` varchar(64) NOT NULL DEFAULT '',-->
+        <!--            `company_position` varchar(64) NOT NULL DEFAULT '' COMMENT '役職',-->
+        <!--            `company_postal_code` varchar(8) NOT NULL DEFAULT '',-->
+        <!--            `company_address` varchar(128) NOT NULL DEFAULT '',-->
+        <!--            `company_tel` varchar(16) NOT NULL DEFAULT '',-->
+        <!--            `company_fax` varchar(16) NOT NULL DEFAULT '',-->
+        <!--            `mobile_tel` varchar(16) NOT NULL DEFAULT '',-->
+        <!--            `email` varchar(128) NOT NULL DEFAULT '',-->
+        <!--            `business_category_id` mediumint(8) unsigned NOT NULL DEFAULT '0' COMMENT '業種ID',-->
+        <!--            `business_content` text NOT NULL DEFAULT '' COMMENT '事業内容',-->
+        <!--            `company_established_date` date NOT NULL DEFAULT '0000-00-00' COMMENT '設立年月日',-->
+        <!--            `company_capital` varchar(16) NOT NULL DEFAULT '' COMMENT '資本金',-->
+        <!--            `company_employees` varchar(16) NOT NULL DEFAULT '' COMMENT '社員数',-->
+        <!--            `catch_copy` text NOT NULL DEFAULT '',-->
+        <!--            `bis_info` varchar(128) NOT NULL DEFAULT '',-->
+        <!--            `blog_start` date NOT NULL DEFAULT '0000-00-00',-->
+        <!--            `blog_url` varchar(128) NOT NULL DEFAULT '',-->
+        <!--            `company_url` varchar(128) NOT NULL DEFAULT '',-->
+        <!--            `facebook_url` varchar(128) NOT NULL DEFAULT '',-->
+        <!--            `x_url` varchar(128) NOT NULL DEFAULT '',-->
+        <!--            `instagram_url` varchar(128) NOT NULL DEFAULT '',-->
+        <!--            `youtube_url` varchar(128) NOT NULL DEFAULT '',-->
+        <!--            `my_profile` text NOT NULL DEFAULT '' COMMENT 'プロフィール自由記入欄',-->
+        <!--            `status` char(1) NOT NULL DEFAULT 'A',-->
+        <!--            PRIMARY KEY (`user_id`)-->
+        <!--            ) ENGINE=MyISAM DEFAULT CHARSET UTF8;-->
+        <!--        </item>-->
+        <!--        <item for="uninstall">DROP TABLE IF EXISTS ?:community_profiles;</item>-->
 
-        <!--業種マスター-->
-        <item>DROP TABLE IF EXISTS ?:business_categories;</item>
-        <item>
-            CREATE TABLE `?:business_categories` (
-            `business_category_id` mediumint(8) UNSIGNED NOT NULL AUTO_INCREMENT,
-            `business_category` varchar(64) NOT NULL,
-            `position` mediumint(8) NOT NULL DEFAULT '0',
-            `status` char(1) NOT NULL DEFAULT 'A',
-            PRIMARY KEY (`business_category_id`)
-            ) ENGINE=MyISAM DEFAULT CHARSET UTF8;
-        </item>
-        <item for="uninstall">DROP TABLE IF EXISTS ?:business_categories;</item>
+        <!--        &lt;!&ndash;業種マスター&ndash;&gt;-->
+        <!--        <item>DROP TABLE IF EXISTS ?:business_categories;</item>-->
+        <!--        <item>-->
+        <!--            CREATE TABLE `?:business_categories` (-->
+        <!--            `business_category_id` mediumint(8) UNSIGNED NOT NULL AUTO_INCREMENT,-->
+        <!--            `business_category` varchar(64) NOT NULL,-->
+        <!--            `position` mediumint(8) NOT NULL DEFAULT '0',-->
+        <!--            `status` char(1) NOT NULL DEFAULT 'A',-->
+        <!--            PRIMARY KEY (`business_category_id`)-->
+        <!--            ) ENGINE=MyISAM DEFAULT CHARSET UTF8;-->
+        <!--        </item>-->
+        <!--        <item for="uninstall">DROP TABLE IF EXISTS ?:business_categories;</item>-->
 
         <!--ショップ地域マスター -->
         <!--        <item>DROP TABLE IF EXISTS ?:store_regions;</item>-->
