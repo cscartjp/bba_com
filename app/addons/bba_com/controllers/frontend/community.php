@@ -17,15 +17,6 @@ if (!defined('BOOTSTRAP')) {
 // ---------------------- POST routine ------------------------------------- //
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    //preview_as_user
-    if ($mode === 'preview_as_user') {
-        $now_hash = fn_bbcmm_get_hashed_time();
-        /** @noinspection PhpUndefinedFunctionInspection */
-        fn_login_user($_REQUEST['user_id'], true);
-        $redirect_url = $_REQUEST['redirect_url'] ?? 'community.index';
-        /** @noinspection PhpUndefinedConstantInspection */
-        return [CONTROLLER_STATUS_REDIRECT, $_REQUEST['redirect_url']];
-    }
 
     //add_new_post
     if ($mode === 'add_new_post') {
@@ -51,7 +42,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
 
         //データのサニタイズ
-        SecurityHelper::sanitizeObjectData('newsletter', $_post_data);
+//        SecurityHelper::sanitizeObjectData('newsletter', $_post_data);
 
         //データベースに保存
         /** @noinspection PhpUndefinedFunctionInspection */
@@ -66,15 +57,76 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
 
         $redirect_url = $_REQUEST['redirect_url'] ?? 'community.index';
+
+        //$redirect_urlのクエリパラメーターを取得
+        $parameter = parse_url($redirect_url, PHP_URL_QUERY);
+        //$parameterを配列に変換
+        parse_str($parameter, $parameter);
+
+        //$parameterにpageが含まれている場合は除外
+        if (isset($parameter['page'])) {
+            unset($parameter['page']);
+        }
+
+        //クエリパラメーターを再構築
+        $redirect_url = strtok($redirect_url, '?') . '?' . http_build_query($parameter);
+
+        /** @noinspection PhpUndefinedConstantInspection */
+        return [CONTROLLER_STATUS_REDIRECT, $redirect_url];
+    }
+
+
+    //add_new_comment
+    if ($mode === 'add_new_comment') {
+
+        $user_post_data = $_REQUEST['new_comment'];
+        $_post_data = [
+            'user_id' => $auth['user_id'],
+            'parent_id' => $user_post_data['parent_id'],
+            'post_type' => 'C',
+            'article' => $user_post_data['article'],
+            'timestamp' => date('Y-m-d H:i:s'),
+        ];
+
+        //データのサニタイズ
+//        SecurityHelper::sanitizeObjectData('newsletter', $_post_data);
+
+        //データベースに保存
+        /** @noinspection PhpUndefinedFunctionInspection */
+        $post_id = db_query("INSERT INTO ?:community_user_posts ?e", $_post_data);
+
+        if ($post_id) {
+            /** @noinspection PhpUndefinedFunctionInspection */
+            fn_set_notification('N', __('notice'), __('bba_com.comment_added'));
+        } else {
+            /** @noinspection PhpUndefinedFunctionInspection */
+            fn_set_notification('E', __('error'), __('bba_com.comment_not_added'));
+        }
+
+        $redirect_url = $_REQUEST['redirect_url'] ?? 'community.index';
+
+        /** @noinspection PhpUndefinedConstantInspection */
+        return [CONTROLLER_STATUS_OK, $redirect_url];
+    }
+
+
+    //preview_as_user
+    if ($mode === 'preview_as_user') {
+        $now_hash = fn_bbcmm_get_hashed_time();
+        /** @noinspection PhpUndefinedFunctionInspection */
+        fn_login_user($_REQUEST['user_id'], true);
+        $redirect_url = $_REQUEST['redirect_url'] ?? 'community.index';
         /** @noinspection PhpUndefinedConstantInspection */
         return [CONTROLLER_STATUS_REDIRECT, $_REQUEST['redirect_url']];
     }
+
 }
 
 // ---------------------- GET routine ------------------------------------- //
 
 //community.my_profile
 if ($mode === 'my_profile') {
+
 
     $params = $_REQUEST;
 
@@ -113,16 +165,8 @@ if ($mode === 'my_profile') {
 
     [$user_posts, $search] = fn_bbcmm_get_user_posts($params, Registry::get('settings.Appearance.elements_per_page'));
 
-//    if (defined('DEVELOPMENT')) {
-//        fn_lcjp_dev_notify([
-//            $search,
-//            $posts,
-//        ]);
-//    }
-
     Tygh::$app['view']->assign('user_posts', $user_posts);
     Tygh::$app['view']->assign('search', $search);
-
 }
 
 //GET routineの場合は404

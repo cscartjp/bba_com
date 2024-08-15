@@ -36,6 +36,7 @@ function fn_bbcmm_get_user_posts(array $params = [], int $items_per_page = 0): a
 {
     $default_params = [
         'items_per_page' => $items_per_page,
+        'parent_id' => 0,
     ];
 
     /** @noinspection PhpUndefinedConstantInspection */
@@ -44,9 +45,22 @@ function fn_bbcmm_get_user_posts(array $params = [], int $items_per_page = 0): a
     }
     $params = array_merge($default_params, $params);
 
+//    $params['parent_id'] = $params['parent_id'] ?? 0;
+
     $fields = ['up.*'];
 
     $condition = '1';
+
+//    if ($params['parent_id']) {}
+    /** @noinspection PhpUndefinedFunctionInspection */
+    $condition .= db_quote(" AND up.parent_id = ?i", $params['parent_id']);
+
+    //
+    if ($params['post_type']) {
+        /** @noinspection PhpUndefinedFunctionInspection */
+        $condition .= db_quote(" AND up.post_type = ?s", $params['post_type']);
+    }
+
     if ($params['status']) {
         /** @noinspection PhpUndefinedFunctionInspection */
         $condition .= db_quote(" AND up.status = ?s", $params['status']);
@@ -89,19 +103,106 @@ function fn_bbcmm_get_user_posts(array $params = [], int $items_per_page = 0): a
     /** @noinspection PhpUndefinedFunctionInspection */
     $user_posts = db_get_array("SELECT $fields FROM ?:community_user_posts AS up $join WHERE ?p ?p ?p ?p", $condition, $group_by, $sorting, $limit);
 
-    foreach ($user_posts as &$user_post) {
-        [$article, $urls] = fn_bbcmm_convert_post_content($user_post['article']);
-        $user_post['article'] = $article;
-        $user_post['url'] = $urls[0][0];
 
-        if ($user_post['url']) {
-            //$user_post['url']からOGP画像情報を取得する
-            $user_post['ogp_info'] = fn_bbcmm_get_ogp_info($user_post['url']);
+    //プロフィールアイコン取得
+    $community_profile_images = [];
+    foreach ($user_posts as &$user_post) {
+
+        if (!$community_profile_images[$user_post['user_id']]) {
+            //user_idからアイコン画像を取得する
+            /** @noinspection PhpUndefinedFunctionInspection */
+            $community_profile_images[$user_post['user_id']] = fn_get_image_pairs($user_post['user_id'], 'community_profile', 'M', true, true, CART_LANGUAGE);
+        }
+        $user_post['profile_image'] = $community_profile_images[$user_post['user_id']];
+
+
+        //投稿内容を改行をBRタグに変換する、URLをリンクに変換し、OGP情報を取得する
+        //T：タイムラインに投稿した場合
+        if ($params['post_type'] === 'T' && $params['parent_id'] === 0) {
+            fn_bbcmm_format_parent_post($user_post);
+
+
+            //TODO コメントを取得する
+            $user_comments = fn_bbcmm_get_user_comments($user_post['post_id']);
+            if ($user_comments) {
+                $user_post['comments'] = $user_comments;
+            }
         }
     }
-    
 
     return [$user_posts, $params];
+}
+
+////プロフィールアイコン取得
+//function fn_bbcmm_get_profile_image($user_posts)
+//{
+//    $community_profile_images = [];
+//    foreach ($user_posts as &$user_post) {
+//        if (!$community_profile_images[$user_post['user_id']]) {
+//            //user_idからアイコン画像を取得する
+//            /** @noinspection PhpUndefinedFunctionInspection */
+//            $community_profile_images[$user_post['user_id']] = fn_get_image_pairs($user_post['user_id'], 'community_profile', 'M', true, true, CART_LANGUAGE);
+//        }
+//        $user_post['profile_image'] = $community_profile_images[$user_post['user_id']];
+//    }
+//
+//    return $user_posts;
+//}
+
+//コメントを取得する（最大3件）
+function fn_bbcmm_get_user_comments($parent_id, $max = 3)
+{
+    $params = [
+        'items_per_page' => $max,
+        'parent_id' => $parent_id,
+        'post_type' => 'C',//C: コメント
+    ];
+
+    [$user_comments, $search] = fn_bbcmm_get_user_posts($params, $max);
+
+    //articleを整形する
+    foreach ($user_comments as &$user_comment) {
+        //mb_strimwidth
+        $user_comment['article'] = mb_strimwidth($user_comment['article'], 0, 120, '...', 'UTF-8');
+    }
+
+    return $user_comments;
+}
+
+
+//親投稿のデータを整形する
+function fn_bbcmm_format_parent_post(&$parent_post)
+{
+    //投稿内容を改行をBRタグに変換する、URLをリンクに変換し、OGP情報を取得する
+    [$article, $urls] = fn_bbcmm_convert_post_content($parent_post['article']);
+    $parent_post['article'] = $article;
+    $parent_post['url'] = $urls[0][0];
+
+    if ($parent_post['url']) {
+        //$parent_post['url']からOGP画像情報を取得する
+        $parent_post['ogp_info'] = fn_bbcmm_get_ogp_info($parent_post['url']);
+    }
+
+//    return $parent_post;
+}
+
+
+//引数（投稿内容）を改行をBRタグに変換する、URLをリンクに変換する
+function fn_bbcmm_convert_post_content($str): array
+{
+    $str = trim($str);
+
+    //改行をBRタグに変換
+    $str = nl2br($str);
+
+    //$strに含まれるURLを抽出する
+    $urls = [];
+    preg_match_all('/(https?:\/\/[a-zA-Z0-9\.\-\/\?\&\=\_\%\#\~\:\;\,\@\!\+\*]+)/', $str, $urls);
+
+    //URLをリンクに変換
+    $str = preg_replace('/(https?:\/\/[a-zA-Z0-9\.\-\/\?\&\=\_\%\#\~\:\;\,\@\!\+\*]+)/', '<i class="ty-icon ty-icon-popup"></i><a href="$1" target="_blank">$1</a>', $str);
+
+    return [$str, $urls];
 }
 
 //fn_bbcmm_get_ogp_info は、引数（URL）からOGPに関する情報を取得する(image, title, description, link)
@@ -139,25 +240,6 @@ function fn_bbcmm_get_ogp_info($url): array
     }
 
     return $ogp;
-}
-
-
-//引数（投稿内容）を改行をBRタグに変換する、URLをリンクに変換する
-function fn_bbcmm_convert_post_content($str): array
-{
-    $str = trim($str);
-
-    //改行をBRタグに変換
-    $str = nl2br($str);
-
-    //$strに含まれるURLを抽出する
-    $urls = [];
-    preg_match_all('/(https?:\/\/[a-zA-Z0-9\.\-\/\?\&\=\_\%\#\~\:\;\,\@\!\+\*]+)/', $str, $urls);
-
-    //URLをリンクに変換
-    $str = preg_replace('/(https?:\/\/[a-zA-Z0-9\.\-\/\?\&\=\_\%\#\~\:\;\,\@\!\+\*]+)/', '<i class="ty-icon ty-icon-popup"></i><a href="$1" target="_blank">$1</a>', $str);
-
-    return [$str, $urls];
 }
 
 

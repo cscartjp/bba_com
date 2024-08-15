@@ -110,11 +110,14 @@
   border-radius: 15px;
   margin-bottom: 40px;
 
+
   .bba-community-new-post-header {
     display: flex;
     align-items: center;
     padding: 10px;
     background-color: #eee;
+    border-radius: 15px 15px 0 0;
+
 
     .bba-community-new-post-user-icon {
       .bba-post-user-icon {
@@ -161,8 +164,9 @@
 
   .bba-community-new-post-footer {
     display: flex;
-    background-color: #efefef;
     justify-content: flex-end;
+    background-color: #efefef;
+    border-radius: 0 0 15px 15px;
 
     .buttons-container {
       background-color: inherit;
@@ -189,6 +193,7 @@
       align-items: center;
       padding: 10px;
       background-color: #eee;
+      border-radius: 15px 15px 0 0;
 
       .bba-community-post-user-icon {
         .bba-post-user-icon {
@@ -221,9 +226,8 @@
       //margin-bottom: 10px;
       padding: 20px 20px 30px;
 
-
       .bba-community-post-ogp-info {
-        padding: 10px;
+        padding: 20px;
         border: 1px solid #ddd;
         margin-bottom: 10px;
         background-color: #f9f9f9;
@@ -237,14 +241,13 @@
             display: block;
             width: 100%;
             height: auto;
-            margin-bottom: 10px;
-
           }
 
           .bba-community-ogp-title {
             font-size: 0.9em;
             line-height: 1.2em;
             font-weight: bold;
+            margin-top: 10px;
             //margin-bottom: 10px;
           }
 
@@ -271,20 +274,128 @@
     }
 
     .bba-community-post-footer {
-      display: flex;
-      justify-content: flex-end;
-      align-items: center;
+
       padding: 10px;
       background-color: #efefef;
+      border-radius: 0 0 15px 15px;
 
-      .bba-community-post-footer-like,
-      .bba-community-post-footer-comment {
-        padding-left: 10px;
+      .bba-community-post-control {
+        display: flex;
+        justify-content: flex-end;
+        align-items: center;
 
-        span {
-          margin-left: 5px;
-          font-size: 0.8em;
+
+        .bba-community-post-footer-like,
+        .bba-community-post-footer-comment {
+          padding-left: 10px;
+
+          .bba-community-post-like-btn:hover,
+          .bba-community-post-comment-btn:hover {
+            text-decoration: none;
+          }
+
+          span {
+            margin-left: 5px;
+            font-size: 0.8em;
+          }
         }
+      }
+
+
+      .bba-community-post-comment-list {
+        //background-color: #fff;
+        padding: 10px;
+
+        .bba-community-post-comment-item {
+          display: flex;
+          margin-bottom: 20px;
+
+          .bba-community-post-comment-item-user-icon {
+            padding-right: 16px;
+
+            img {
+              display: block;
+              min-width: 50px;
+              min-height: 50px;
+              border-radius: 50%;
+            }
+          }
+
+          .bba-community-post-comment-item-body {
+            flex-grow: 1;
+
+
+            .bba-community-post-comment-article {
+              background-color: #fff;
+              border-radius: 10px;
+              padding: 10px;
+              margin-bottom: 20px;
+
+              h4 {
+                font-size: 0.8em;
+                line-height: 1em;
+                margin: 0;
+                font-weight: bold;
+              }
+
+              p {
+                font-size: 0.8em;
+                line-height: 1.5em;
+              }
+            }
+
+            .bba-community-post-comment-timestamp {
+              font-size: 0.7em;
+              line-height: 1em;
+              color: #999;
+            }
+
+
+          }
+
+        }
+      }
+
+
+      .bba-community-post-comment {
+        display: none;
+
+        .bba-community-comment-form {
+          display: flex;
+          align-items: center;
+          //position: relative;
+          //padding: 10px;
+          background-color: #fff;
+          border: 1px solid #ddd;
+          border-radius: 5px;
+
+          .ty-control-group {
+            flex-grow: 1;
+            margin: 0 !important;
+
+            .bba-community-post-comment-form-title {
+              display: none;
+            }
+
+            .bba-community-post-comment-textarea {
+              width: 100%;
+              height: 80px;
+              border: none;
+            }
+          }
+
+          .bba-community-post-comment-form-btn {
+            padding-right: 10px;
+
+            //position: absolute;
+            //right: 0;
+            //bottom: 0;
+          }
+        }
+      }
+
+      .bba-community-post-comment.open {
+        display: block;
       }
     }
   }

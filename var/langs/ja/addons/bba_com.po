@@ -192,3 +192,23 @@ msgstr "投稿しました"
 msgctxt "Languages::bba_com.post_not_added"
 msgid "投稿に失敗しました"
 msgstr "投稿に失敗しました"
+
+msgctxt "Languages::bba_com.like_the_post"
+msgid "いいね！"
+msgstr "いいね！"
+
+msgctxt "Languages::bba_com.comment_the_post"
+msgid "コメント"
+msgstr "コメント"
+
+msgctxt "Languages::bba_com.comment_the_post_ph"
+msgid "コメントを入力"
+msgstr "コメントを入力"
+
+msgctxt "Languages::bba_com.comment_added"
+msgid "コメントを投稿しました"
+msgstr "コメントを投稿しました"
+
+msgctxt "Languages::bba_com.comment_not_added"
+msgid "コメントの投稿に失敗しました"
+msgstr "コメントの投稿に失敗しました"
