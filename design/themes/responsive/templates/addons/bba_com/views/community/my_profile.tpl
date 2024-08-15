@@ -77,6 +77,18 @@
     (function (_, $) {
         {*$.ceEvent('on', 'ce.commoninit', function (context) {});*}
 
+        //いいね数の更新 ajaxでデータがassignされた後に実行される
+        $.ceEvent('on', 'ce.ajaxdone', function (elms, inline_scripts, params, data, response_text) {
+            //response_textはJSON形式で返ってくるので、JSON.parseでオブジェクトに変換する
+            if (data.text) {
+                let response_obj = JSON.parse(data.text);
+                {*#like_counter_{response_obj.post_id}の中身をresponse_obj.like_countに変更する*}
+                if (response_obj.post_id && response_obj.like_count) {
+                    $('#like_counter_' + response_obj.post_id).text(response_obj.like_count);
+                }
+            }
+        });
+
         //.bba-community-post-comment-btnがクリックされたらdata-post-idを取得して、アラートとして表示する
         $(document).on('click', '.bba-community-post-comment-btn', function () {
             const postId = $(this).data('post-id');

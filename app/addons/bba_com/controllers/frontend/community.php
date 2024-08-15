@@ -18,6 +18,52 @@ if (!defined('BOOTSTRAP')) {
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
+    //like
+    if ($mode === 'like') {
+        $post_id = $_REQUEST['post_id'];
+        $user_id = $auth['user_id'];
+
+
+        //既にいいねしているか確認
+        /** @noinspection PhpUndefinedFunctionInspection */
+        $like_data = db_get_row("SELECT * FROM ?:community_user_post_likes WHERE post_id = ?i AND user_id = ?i", $post_id, $user_id);
+
+        if ($like_data) {
+            /** @noinspection PhpUndefinedFunctionInspection */
+            db_query("DELETE FROM ?:community_user_post_likes WHERE post_id = ?i AND user_id = ?i", $post_id, $user_id);
+            /** @noinspection PhpUndefinedFunctionInspection */
+            fn_set_notification('N', __('notice'), __('bba_com.like_removed'));
+        } else {
+            $_like_data = [
+                'post_id' => $post_id,
+                'user_id' => $user_id,
+                'timestamp' => date('Y-m-d H:i:s'),
+            ];
+
+            /** @noinspection PhpUndefinedFunctionInspection */
+            db_query("INSERT INTO ?:community_user_post_likes ?e", $_like_data);
+//            /** @noinspection PhpUndefinedFunctionInspection */
+//            fn_set_notification('N', __('notice'), __('bba_com.like_added'));
+        }
+
+        //追加後のいいね数を取得
+        /** @noinspection PhpUndefinedFunctionInspection */
+        $like_count = db_get_field("SELECT COUNT(*) FROM ?:community_user_post_likes WHERE post_id = ?i", $post_id);
+
+        $like_data = [
+            'post_id' => $post_id,
+            'like_count' => $like_count,
+        ];
+
+        //$like_countをJSON形式で返す
+        try {
+            echo json_encode($like_data, JSON_THROW_ON_ERROR);
+        } catch (JsonException $e) {
+            echo '';
+        }
+        exit;
+    }
+
     //add_new_post
     if ($mode === 'add_new_post') {
 
@@ -162,8 +208,10 @@ if ($mode === 'my_profile') {
     //ユーザーポスト(タイムライン)を取得
     $params['user_id'] = $auth['user_id'];//ログインユーザーのID
     $params['post_type'] = 'T';//T: タイムライン
+    $params['disp_like'] = true;//いいねボタンを表示するか
 
     [$user_posts, $search] = fn_bbcmm_get_user_posts($params, Registry::get('settings.Appearance.elements_per_page'));
+
 
     Tygh::$app['view']->assign('user_posts', $user_posts);
     Tygh::$app['view']->assign('search', $search);

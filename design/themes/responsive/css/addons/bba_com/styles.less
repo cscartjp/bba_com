@@ -308,7 +308,7 @@
 
         .bba-community-post-comment-item {
           display: flex;
-          margin-bottom: 20px;
+          margin-bottom: 30px;
 
           .bba-community-post-comment-item-user-icon {
             padding-right: 16px;
@@ -329,13 +329,17 @@
               background-color: #fff;
               border-radius: 10px;
               padding: 10px;
-              margin-bottom: 20px;
+              margin-bottom: 5px;
 
               h4 {
                 font-size: 0.8em;
                 line-height: 1em;
                 margin: 0;
                 font-weight: bold;
+
+                a {
+                  font-weight: bold;
+                }
               }
 
               p {
@@ -349,10 +353,15 @@
               line-height: 1em;
               color: #999;
             }
-
-
           }
+        }
 
+        .bba-community-post-comment-item.not-my-comment {
+          .bba-community-post-comment-item-user-icon {
+            order: 2;
+            padding-right: 0;
+            padding-left: 16px;
+          }
         }
       }
 

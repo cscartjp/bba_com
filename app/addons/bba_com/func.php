@@ -71,10 +71,30 @@ function fn_bbcmm_get_user_posts(array $params = [], int $items_per_page = 0): a
 
     // ソート順
     $sortings = [
-//        'sort_business_category' => 'up.business_category',
-//        'sort_position' => 'up.position',
         'sort_timestamp' => 'up.timestamp',
     ];
+
+    //T：タイムラインに投稿した場合(親投稿)
+    if ($params['disp_like'] === true && $params['post_type'] === 'T' && $params['parent_id'] === 0) {
+        //いいね数を取得する
+        /** @noinspection PhpUndefinedFunctionInspection */
+        $join .= db_quote(" LEFT JOIN ?:community_user_post_likes AS upl ON up.post_id = upl.post_id");
+
+        //いいね数を取得する
+        $fields[] = 'COUNT(DISTINCT upl.like_id) AS likes_count';
+        $group_by = 'GROUP BY up.post_id';
+
+        //自分()のいいねがあるかどうか
+        $auth = Tygh::$app['session']['auth'];
+        $fields[] = db_quote("IFNULL(SUM(upl.user_id = ?i), 0) AS is_liked", $auth['user_id']);//自分()のいいねがあるかどうか
+    }
+
+    //post_typeがC：コメントの場合は、?:community_profilesをJOINして、ユーザー名を取得する
+    if ($params['post_type'] === 'C') {
+        $join .= db_quote(" LEFT JOIN ?:community_profiles AS cp ON up.user_id = cp.user_id");
+        $fields[] = 'cp.name AS poster_name';
+    }
+
 
 //    //登録店舗数を表示する場合
 //    if ($params['display_store_count'] === 'Y' || $params['display_only_registered_store'] === 'Y') {
@@ -96,7 +116,8 @@ function fn_bbcmm_get_user_posts(array $params = [], int $items_per_page = 0): a
     $limit = '';
     if (!empty($params['items_per_page'])) {
         /** @noinspection PhpUndefinedFunctionInspection */
-        $params['total_items'] = db_get_field("SELECT COUNT(*) FROM ?:community_user_posts AS up $join WHERE ?p ?p ?p", $condition, $group_by, $limit);
+//        $params['total_items'] = db_get_field("SELECT COUNT(*) FROM ?:community_user_posts AS up $join WHERE ?p ?p ?p", $condition, $group_by, $limit);
+        $params['total_items'] = db_get_field("SELECT COUNT(*) FROM ?:community_user_posts AS up WHERE ?p", $condition);
         /** @noinspection PhpUndefinedFunctionInspection */
         $limit = db_paginate($params['page'], $params['items_per_page']);
     }
