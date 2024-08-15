@@ -14,10 +14,9 @@
         <div class="bba-timeline">
             {* 書き込む *}
             <div class="bba-community-new-post">
-                <form action="{""|fn_url}" method="post" class="posts-form">
+                <form action="{""|fn_url}" method="post" class="posts-form" name="post_new" id="post_new">
 
                     <input type="hidden" name="redirect_url" value="{$config.current_url}"/>
-
                     {* T：タイムラインに投稿する*}
                     <input type="hidden" name="new_post[post_type]" value="T"/>
 
@@ -50,7 +49,6 @@
                 </form>
             </div>
 
-
             {* タイムライン*}
             <div class="bba-community-posts">
 
@@ -59,48 +57,8 @@
                 {if $user_posts}
                     {assign var="post_user_icon_size" value=60}
                     {foreach from=$user_posts item=up}
-                        <div class="bba-community-post">
-                            <div class="bba-community-post-header">
-                                <div class="bba-community-post-user-icon">
-                                    {include file="common/image.tpl" image_width=$post_user_icon_size image_height=$post_user_icon_size images=$cp_data.profile_image no_ids=true class="bba-post-user-icon"}
-                                </div>
-                                <div class="bba-community-post-header-name">
-                                    <h4>{$cp_data.name}</h4>
-                                    <p>{$up.timestamp}</p>
-                                </div>
-                            </div>
-                            <div class="bba-community-post-body">
-
-                                {if $up.ogp_info.image}
-                                    <div class="bba-community-post-ogp-info">
-                                        <a href="{$up.ogp_info.link}" target="_blank">
-                                            <div class="bba-community-ogp-image">
-                                                {*                                                <img src="{$up.ogp_info.image}"/>*}
-
-                                                <img class="lazyload" data-src="{$up.ogp_info.image}"
-                                                     src="/images/no_image.png" alt=""/>
-                                            </div>
-                                            <p class="bba-community-ogp-title">{$up.ogp_info.title}</p>
-                                            <p class="bba-community-ogp-description">{$up.ogp_info.description}</p>
-                                        </a>
-                                    </div>
-                                {/if}
-                                
-                                <div class="bba-community-post-article">
-                                    {$up.article nofilter}
-                                </div>
-                            </div>
-                            <div class="bba-community-post-footer">
-                                <div class="bba-community-post-footer-like">
-                                    <i class="ty-icon-heart"></i>
-                                    <span>いいね！</span>
-                                </div>
-                                <div class="bba-community-post-footer-comment">
-                                    <i class="ty-icon-bubble"></i>
-                                    <span>コメント</span>
-                                </div>
-                            </div>
-                        </div>
+                        {*コンテンツ*}
+                        {include file="addons/bba_com/views/community/components/user_post_content.tpl" cp_data=$cp_data post_data=$up post_user_icon_size=$post_user_icon_size}
                     {/foreach}
 
                 {else}
@@ -111,22 +69,20 @@
                 {include file="common/pagination.tpl" full_render=true }
 
             </div>
-
-
-            {*            <pre>*}
-            {*    {$cp_data|var_dump}*}
-            {*</pre>*}
-
         </div>
     </div>
 </div>
 
+<script>
+    (function (_, $) {
+        {*$.ceEvent('on', 'ce.commoninit', function (context) {});*}
 
-{*<pre>*}
-{*    {$auth|var_dump}*}
-{*</pre>*}
-
-
-
+        //.bba-community-post-comment-btnがクリックされたらdata-post-idを取得して、アラートとして表示する
+        $(document).on('click', '.bba-community-post-comment-btn', function () {
+            const postId = $(this).data('post-id');
+            $("#comment_to_" + postId).toggle();
+        });
+    })(Tygh, Tygh.$);
+</script>
 
 {capture name="mainbox_title"}{__("bba_com.community_my_profile")}{/capture}
