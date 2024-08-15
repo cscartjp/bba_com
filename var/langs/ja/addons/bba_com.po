@@ -220,3 +220,15 @@ msgstr "いいね！しました"
 msgctxt "Languages::bba_com.like_removed"
 msgid "いいね！を取り消しました"
 msgstr "いいね！を取り消しました"
+
+msgctxt "Languages::bba_com.add_friend"
+msgid "友達追加"
+msgstr "友達追加"
+
+msgctxt "Languages::bba_com.send_dm"
+msgid "DMを送る"
+msgstr "DMを送る"
+
+msgctxt "Languages::bba_com.community_my_profile_products"
+msgid "このユーザーの商品"
+msgstr "このユーザーの商品"

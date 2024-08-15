@@ -173,14 +173,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 //community.my_profile
 if ($mode === 'my_profile') {
 
-
-    $params = $_REQUEST;
-
     //ログインしていない場合はログインページへ
     if (empty($auth['user_id'])) {
         /** @noinspection PhpUndefinedConstantInspection */
         return array(CONTROLLER_STATUS_REDIRECT, 'auth.login_form?return_url=' . urlencode(Registry::get('config.current_url')));
     }
+
+    $params = $_REQUEST;
 
 
     //パンくずリストを追加
@@ -216,6 +215,70 @@ if ($mode === 'my_profile') {
     Tygh::$app['view']->assign('user_posts', $user_posts);
     Tygh::$app['view']->assign('search', $search);
 }
+
+
+//community.view_user 他のユーザーのプロフィールを表示
+if ($mode === 'view_user') {
+
+    //ログインしていない場合はログインページへ
+    if (empty($auth['user_id'])) {
+        /** @noinspection PhpUndefinedConstantInspection */
+        return array(CONTROLLER_STATUS_REDIRECT, 'auth.login_form?return_url=' . urlencode(Registry::get('config.current_url')));
+    }
+
+    $params = $_REQUEST;
+
+    //$params['user_id']が数字でない場合は404
+    if (!is_numeric($params['user_id'])) {
+        /** @noinspection PhpUndefinedConstantInspection */
+        return [CONTROLLER_STATUS_NO_PAGE];
+    }
+
+    //$params['user_id']と$auth['user_id']が一致する場合はmy_profileにリダイレクト
+    if ((int)$params['user_id'] === (int)$auth['user_id']) {
+        /** @noinspection PhpUndefinedConstantInspection */
+        return [CONTROLLER_STATUS_REDIRECT, 'community.my_profile'];
+    }
+
+
+    //ユーザーデータを取得
+    /** @noinspection PhpUndefinedFunctionInspection */
+    $cp_data = db_get_row("SELECT * FROM ?:community_profiles WHERE user_id = ?i", $params['user_id']);
+    if (!$cp_data) {
+        /** @noinspection PhpUndefinedConstantInspection */
+        return [CONTROLLER_STATUS_NO_PAGE];
+    }
+
+    //このユーザーのcompany_idを取得
+    $cp_data['company_id'] = db_get_field("SELECT company_id FROM ?:users WHERE user_id = ?i", $params['user_id']);
+
+
+    //画像データを取得
+    /** @noinspection PhpUndefinedFunctionInspection */
+    /** @noinspection PhpUndefinedConstantInspection */
+    $cp_data['profile_image'] = fn_get_image_pairs($cp_data['user_id'], 'community_profile', 'M', true, true, CART_LANGUAGE);
+    $cp_data['community_image_1'] = fn_get_image_pairs($cp_data['user_id'], 'community_image_1', 'M', true, true, CART_LANGUAGE);
+    $cp_data['community_image_2'] = fn_get_image_pairs($cp_data['user_id'], 'community_image_2', 'M', true, true, CART_LANGUAGE);
+    $cp_data['community_image_3'] = fn_get_image_pairs($cp_data['user_id'], 'community_image_3', 'M', true, true, CART_LANGUAGE);
+
+    //このユーザーのタイムラインを取得
+    $params['post_type'] = 'T';//T: タイムライン
+    $params['user_id'] = $cp_data['user_id'];//表示するユーザーのID
+    $params['disp_like'] = true;//いいねボタンを表示するか
+    [$user_posts, $search] = fn_bbcmm_get_user_posts($params, Registry::get('settings.Appearance.elements_per_page'));
+
+    //パンくずリストを追加
+    /** @noinspection PhpUndefinedFunctionInspection */
+    fn_add_breadcrumb(__('bba_com.community_index'), 'community.index');
+    /** @noinspection PhpUndefinedFunctionInspection */
+    fn_add_breadcrumb($cp_data['name'] . __('bba_com.community_profile'));
+
+
+    Tygh::$app['view']->assign('cp_data', $cp_data);
+    Tygh::$app['view']->assign('user_posts', $user_posts);
+    Tygh::$app['view']->assign('search', $search);
+}
+
 
 //GET routineの場合は404
 if ($mode === 'preview_as_user') {

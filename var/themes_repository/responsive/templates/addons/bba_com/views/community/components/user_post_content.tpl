@@ -66,7 +66,7 @@
 
                         {*アイコン*}
                         <div class="bba-community-post-comment-item-user-icon">
-                            {if $not_my_post}<a href="{"community.view?user_id=`$comment.user_id`"|fn_url}">{/if}
+                            {if $not_my_post}<a href="{"community.view_user?user_id=`$comment.user_id`"|fn_url}">{/if}
                             {include file="common/image.tpl" image_width=$comment_user_icon_size image_height=$comment_user_icon_size images=$comment.profile_image no_ids=true class="bba-post-comment-user-icon"}
                                 {if $not_my_post}</a>{/if}
                         </div>
@@ -76,7 +76,7 @@
                             <div class="bba-community-post-comment-article">
                                 <h4>
                                     {if $not_my_post}<a
-                                            href="{"community.view?user_id=`$comment.user_id`"|fn_url}">{/if}
+                                            href="{"community.view_user?user_id=`$comment.user_id`"|fn_url}">{/if}
                                         {$comment.poster_name}
                                         {if $not_my_post}</a>{/if}
                                 </h4>

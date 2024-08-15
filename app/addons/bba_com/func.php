@@ -34,9 +34,12 @@ use Tygh\Registry;
 //?:community_user_postsテーブルからデータを取得する
 function fn_bbcmm_get_user_posts(array $params = [], int $items_per_page = 0): array
 {
+    $auth = Tygh::$app['session']['auth'];
+
     $default_params = [
         'items_per_page' => $items_per_page,
         'parent_id' => 0,
+        'user_id' => $auth['user_id'],
     ];
 
     /** @noinspection PhpUndefinedConstantInspection */
@@ -54,6 +57,7 @@ function fn_bbcmm_get_user_posts(array $params = [], int $items_per_page = 0): a
 //    if ($params['parent_id']) {}
     /** @noinspection PhpUndefinedFunctionInspection */
     $condition .= db_quote(" AND up.parent_id = ?i", $params['parent_id']);
+
 
     //
     if ($params['post_type']) {
@@ -76,6 +80,15 @@ function fn_bbcmm_get_user_posts(array $params = [], int $items_per_page = 0): a
 
     //T：タイムラインに投稿した場合(親投稿)
     if ($params['disp_like'] === true && $params['post_type'] === 'T' && $params['parent_id'] === 0) {
+
+
+        //タイムラインの場合のみuser_id
+        if ($params['user_id']) {
+            /** @noinspection PhpUndefinedFunctionInspection */
+            $condition .= db_quote(" AND up.user_id = ?i", $params['user_id']);
+        }
+
+
         //いいね数を取得する
         /** @noinspection PhpUndefinedFunctionInspection */
         $join .= db_quote(" LEFT JOIN ?:community_user_post_likes AS upl ON up.post_id = upl.post_id");
@@ -85,7 +98,6 @@ function fn_bbcmm_get_user_posts(array $params = [], int $items_per_page = 0): a
         $group_by = 'GROUP BY up.post_id';
 
         //自分()のいいねがあるかどうか
-        $auth = Tygh::$app['session']['auth'];
         $fields[] = db_quote("IFNULL(SUM(upl.user_id = ?i), 0) AS is_liked", $auth['user_id']);//自分()のいいねがあるかどうか
     }
 
@@ -94,18 +106,7 @@ function fn_bbcmm_get_user_posts(array $params = [], int $items_per_page = 0): a
         $join .= db_quote(" LEFT JOIN ?:community_profiles AS cp ON up.user_id = cp.user_id");
         $fields[] = 'cp.name AS poster_name';
     }
-
-
-//    //登録店舗数を表示する場合
-//    if ($params['display_store_count'] === 'Y' || $params['display_only_registered_store'] === 'Y') {
-//        $join .= db_quote(" LEFT JOIN ?:companies AS c ON up.business_category_id = c.business_category_id AND c.status = ?s", "A");
-//        $fields[] = 'COUNT(DISTINCT c.company_id) AS stores_count';
-//        $group_by = 'GROUP BY up.business_category_id';
-//        $sortings['sort_store_count'] = 'stores_count';
-//        $sorting = db_sort($params, $sortings, 'sort_store_count', 'desc');
-//    } else {
-//        $sorting = db_sort($params, $sortings, 'sort_position', 'asc');
-//    }
+    
 
     /** @noinspection PhpUndefinedFunctionInspection */
     $sorting = db_sort($params, $sortings, 'sort_timestamp', 'desc');
