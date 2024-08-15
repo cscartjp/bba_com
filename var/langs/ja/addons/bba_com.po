@@ -212,3 +212,11 @@ msgstr "コメントを投稿しました"
 msgctxt "Languages::bba_com.comment_not_added"
 msgid "コメントの投稿に失敗しました"
 msgstr "コメントの投稿に失敗しました"
+
+msgctxt "Languages::bba_com.like_added"
+msgid "いいね！しました"
+msgstr "いいね！しました"
+
+msgctxt "Languages::bba_com.like_removed"
+msgid "いいね！を取り消しました"
+msgstr "いいね！を取り消しました"

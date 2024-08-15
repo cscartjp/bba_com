@@ -31,9 +31,11 @@
         {*いいね！*}
         <div class="bba-community-post-control">
             <div class="bba-community-post-footer-like">
-                <a href="javascript:void(0);" class="bba-community-post-like-btn" data-post-id="{$post_data.post_id}">
+                <a href="{"community.like?post_id=`$post_data.post_id`"|fn_url}"
+                   class="bba-community-post-like-btn cm-ajax cm-post"
+                   data-post-id="{$post_data.post_id}">
                     <i class="ty-icon-heart"></i>
-                    <span>{$post_data.like_count}</span>
+                    <span id="like_counter_{$post_data.post_id}">{$post_data.likes_count|default:"0"}</span>
                     <span>{__("bba_com.like_the_post")}</span>
                 </a>
             </div>
@@ -51,17 +53,33 @@
         {*コメント一覧*}
         {if $post_data.comments}
             {assign var="comment_user_icon_size" value=40}
+
             <div id="comments_area_{$post_data.post_id}" class="bba-community-post-comment-list">
                 {foreach from=$post_data.comments item=comment}
-                    <div class="bba-community-post-comment-item">
+                    {if $post_data.user_id != $comment.user_id}
+                        {assign var="not_my_post" value="not-my-comment"}
+                    {else}
+                        {assign var="not_my_post" value=""}
+                    {/if}
+                    <div class="bba-community-post-comment-item {$not_my_post}">
 
+
+                        {*アイコン*}
                         <div class="bba-community-post-comment-item-user-icon">
+                            {if $not_my_post}<a href="{"community.view?user_id=`$comment.user_id`"|fn_url}">{/if}
                             {include file="common/image.tpl" image_width=$comment_user_icon_size image_height=$comment_user_icon_size images=$comment.profile_image no_ids=true class="bba-post-comment-user-icon"}
+                                {if $not_my_post}</a>{/if}
                         </div>
 
+                        {*コメント内容*}
                         <div class="bba-community-post-comment-item-body">
                             <div class="bba-community-post-comment-article">
-                                <h4>{$comment.name}AAAAAAAA</h4>
+                                <h4>
+                                    {if $not_my_post}<a
+                                            href="{"community.view?user_id=`$comment.user_id`"|fn_url}">{/if}
+                                        {$comment.poster_name}
+                                        {if $not_my_post}</a>{/if}
+                                </h4>
                                 <p>{$comment.article}</p>
                             </div>
 
@@ -107,27 +125,3 @@
     </div>
 
 </div>
-
-{*        <div class="bba-community-post-comment-list">*}
-{*            {if $post_data.comments}*}
-{*                {foreach from=$post_data.comments item=comment}*}
-{*                    <div class="bba-community-post-comment-item">*}
-{*                        <div class="bba-community-post-comment-item-header">*}
-{*                            <div class="bba-community-post-comment-item-user-icon">*}
-{*                                {include file="common/image.tpl" image_width=$post_user_icon_size image_height=$post_user_icon_size images=$comment.profile_image no_ids=true class="bba-post-user-icon"}*}
-{*                            </div>*}
-{*                            <div class="bba-community-post-comment-item-header-name">*}
-{*                                <h4>{$comment.name}</h4>*}
-{*                                <p>{$comment.timestamp}</p>*}
-{*                            </div>*}
-{*                        </div>*}
-{*                        <div class="bba-community-post-comment-item-body">*}
-{*                            <p>{$comment.comment}</p>*}
-{*                        </div>*}
-{*                    </div>*}
-{*                {/foreach}*}
-{*            {/if}*}
-{*        </div>*}
-
-
-

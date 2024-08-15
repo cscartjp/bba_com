@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <addon scheme="3.0">
     <id>bba_com</id>
-    <version>0.0.3</version>
+    <version>0.0.4</version>
     <priority>70000</priority>
     <position>0</position>
     <status>active</status>
@@ -86,6 +86,21 @@
         <!--            ) ENGINE=MyISAM DEFAULT CHARSET UTF8;-->
         <!--        </item>-->
         <!--        <item for="uninstall">DROP TABLE IF EXISTS ?:community_user_posts;</item>-->
+
+
+        <!--投稿へのいいね -->
+        <item>DROP TABLE IF EXISTS ?:community_user_post_likes;</item>
+        <item>
+            CREATE TABLE `?:community_user_post_likes` (
+            `like_id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT,
+            `post_id` int(11) UNSIGNED NOT NULL,
+            `user_id` mediumint(8) UNSIGNED NOT NULL,
+            `timestamp` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
+            `status` char(1) NOT NULL DEFAULT 'A',
+            PRIMARY KEY (`like_id`)
+            ) ENGINE=MyISAM DEFAULT CHARSET UTF8;
+        </item>
+        <item for="uninstall">DROP TABLE IF EXISTS ?:community_user_post_likes;</item>
 
 
         <!--営業時間-->
