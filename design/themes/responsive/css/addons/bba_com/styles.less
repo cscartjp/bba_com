@@ -64,13 +64,49 @@
 
   }
 
+  .bba-profile-right {
 
-  .bba-profile-edit {
-    //flex-grow: 1;
-    a.bba-profile-edit-link {
-      font-size: 0.8em;
+    .bba-profile-friends {
+      margin-bottom: 10px;
+
+      h3 {
+        font-size: 1em;
+        font-weight: bold;
+        margin-bottom: 10px;
+      }
+
+      .bba-profile-friends-list {
+
+        display: flex;
+
+        a {
+          text-decoration: none;
+
+          .bba-profile-friend-image {
+            display: inline-block;
+            border-radius: 50%;
+            //width: 50px;
+            //height: 50px;
+            margin-right: 2px;
+            border: 2px solid #ddd;
+            box-shadow: 0 0 5px rgba(0, 0, 0, 0.5);
+          }
+        }
+
+
+      }
+
+
+    }
+
+    .bba-profile-edit {
+      //flex-grow: 1;
+      a.bba-profile-edit-link {
+        font-size: 0.8em;
+      }
     }
   }
+
 }
 
 .bba-profile-info {

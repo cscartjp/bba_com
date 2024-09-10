@@ -18,6 +18,37 @@ if (!defined('BOOTSTRAP')) {
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
+    //add_friend
+    if ($mode === 'add_friend') {
+        $user_id = $auth['user_id'];
+        $friend_id = $_REQUEST['friend_id'];
+
+        $_friend_data = [
+            'user_id' => $user_id,
+            'friend_id' => $friend_id,
+            'timestamp' => date('Y-m-d H:i:s'),
+        ];
+
+        /** @noinspection PhpUndefinedFunctionInspection */
+        $relationship_id = db_query("INSERT INTO ?:community_relationships ?e", $_friend_data);
+
+        //逆も友達追加する(相互フォロー)
+        $_friend_data_op = [
+            'user_id' => $friend_id,
+            'friend_id' => $user_id,
+            'timestamp' => date('Y-m-d H:i:s'),
+        ];
+        $op_relationship_id = db_query("INSERT INTO ?:community_relationships ?e", $_friend_data_op);
+
+
+        /** @noinspection PhpUndefinedFunctionInspection */
+        fn_set_notification('N', __('notice'), __('bba_com.friend_added'));
+
+
+        /** @noinspection PhpUndefinedConstantInspection */
+        return [CONTROLLER_STATUS_OK, 'community.view_user?user_id=' . $friend_id];
+    }
+
     //like
     if ($mode === 'like') {
         $post_id = $_REQUEST['post_id'];
@@ -212,8 +243,14 @@ if ($mode === 'my_profile') {
     [$user_posts, $search] = fn_bbcmm_get_user_posts($params, Registry::get('settings.Appearance.elements_per_page'));
 
 
+    //友達情報を取得
+    /** @noinspection PhpUndefinedFunctionInspection */
+    $relationships = fn_bbcmm_get_friends($auth['user_id']);
+
+    
     Tygh::$app['view']->assign('user_posts', $user_posts);
     Tygh::$app['view']->assign('search', $search);
+    Tygh::$app['view']->assign('relationships', $relationships);
 }
 
 
@@ -267,6 +304,11 @@ if ($mode === 'view_user') {
     $params['disp_like'] = true;//いいねボタンを表示するか
     [$user_posts, $search] = fn_bbcmm_get_user_posts($params, Registry::get('settings.Appearance.elements_per_page'));
 
+
+    //友達関係を取得
+    /** @noinspection PhpUndefinedFunctionInspection */
+    $relationship_data = db_get_row("SELECT * FROM ?:community_relationships WHERE user_id = ?i AND friend_id = ?i", $auth['user_id'], $cp_data['user_id']);
+
     //パンくずリストを追加
     /** @noinspection PhpUndefinedFunctionInspection */
     fn_add_breadcrumb(__('bba_com.community_index'), 'community.index');
@@ -277,6 +319,7 @@ if ($mode === 'view_user') {
     Tygh::$app['view']->assign('cp_data', $cp_data);
     Tygh::$app['view']->assign('user_posts', $user_posts);
     Tygh::$app['view']->assign('search', $search);
+    Tygh::$app['view']->assign('relationship_data', $relationship_data);
 }
 
 

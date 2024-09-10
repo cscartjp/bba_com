@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <addon scheme="3.0">
     <id>bba_com</id>
-    <version>0.0.4</version>
+    <version>0.0.5</version>
     <priority>70000</priority>
     <position>0</position>
     <status>active</status>
@@ -89,51 +89,32 @@
 
 
         <!--投稿へのいいね -->
-        <item>DROP TABLE IF EXISTS ?:community_user_post_likes;</item>
+        <!--        <item>DROP TABLE IF EXISTS ?:community_user_post_likes;</item>-->
+        <!--        <item>-->
+        <!--            CREATE TABLE `?:community_user_post_likes` (-->
+        <!--            `like_id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT,-->
+        <!--            `post_id` int(11) UNSIGNED NOT NULL,-->
+        <!--            `user_id` mediumint(8) UNSIGNED NOT NULL,-->
+        <!--            `timestamp` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',-->
+        <!--            `status` char(1) NOT NULL DEFAULT 'A',-->
+        <!--            PRIMARY KEY (`like_id`)-->
+        <!--            ) ENGINE=MyISAM DEFAULT CHARSET UTF8;-->
+        <!--        </item>-->
+        <!--        <item for="uninstall">DROP TABLE IF EXISTS ?:community_user_post_likes;</item>-->
+
+        <!--友達関係 community_relationships-->
+        <item>DROP TABLE IF EXISTS ?:community_relationships;</item>
         <item>
-            CREATE TABLE `?:community_user_post_likes` (
-            `like_id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT,
-            `post_id` int(11) UNSIGNED NOT NULL,
+            CREATE TABLE `?:community_relationships` (
+            `relationship_id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT,
             `user_id` mediumint(8) UNSIGNED NOT NULL,
+            `friend_id` mediumint(8) UNSIGNED NOT NULL,
             `timestamp` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
             `status` char(1) NOT NULL DEFAULT 'A',
-            PRIMARY KEY (`like_id`)
+            PRIMARY KEY (`relationship_id`)
             ) ENGINE=MyISAM DEFAULT CHARSET UTF8;
         </item>
-        <item for="uninstall">DROP TABLE IF EXISTS ?:community_user_post_likes;</item>
-
-
-        <!--営業時間-->
-        <!--        <item>DROP TABLE IF EXISTS ?:business_hours;</item>-->
-        <!--        <item>-->
-        <!--            CREATE TABLE ?:business_hours (-->
-        <!--            `business_hour_id` mediumint(8) unsigned NOT NULL AUTO_INCREMENT,-->
-        <!--            `company_id` mediumint(8) unsigned NOT NULL,-->
-        <!--            `week` smallint(1) NOT NULL,-->
-        <!--            `start_time` time NOT NULL DEFAULT '00:00:00',-->
-        <!--            `end_time` time NOT NULL DEFAULT '00:00:00',-->
-        <!--            `status` char(1) NOT NULL DEFAULT 'A',-->
-        <!--            PRIMARY KEY (`business_hour_id`,`company_id`,`week`)-->
-        <!--            ) ENGINE=MyISAM DEFAULT CHARSET=utf8;-->
-        <!--        </item>-->
-        <!--        <item for="uninstall">DROP TABLE IF EXISTS ?:business_hours;</item>-->
-
-
-        <!--        <item for="install">-->
-        <!--            ALTER TABLE ?:companies-->
-        <!--            ADD business_category_id mediumint(8) DEFAULT '0',-->
-        <!--            ADD store_region_id mediumint(8) DEFAULT '0',-->
-        <!--            ADD store_lat varchar(32) DEFAULT '',-->
-        <!--            ADD store_lng varchar(32) DEFAULT '';-->
-        <!--        </item>-->
-
-        <!--        <item for="uninstall">-->
-        <!--            ALTER TABLE ?:companies-->
-        <!--            DROP business_category_id,-->
-        <!--            DROP store_region_id,-->
-        <!--            DROP store_lat,-->
-        <!--            DROP store_lng;-->
-        <!--        </item>-->
+        <item for="uninstall">DROP TABLE IF EXISTS ?:community_relationships;</item>
 
         <!--        <item for="install">-->
         <!--            ALTER TABLE ?:orders-->
