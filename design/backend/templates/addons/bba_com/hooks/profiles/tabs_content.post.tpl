@@ -225,11 +225,11 @@
             </div>
 
 
-            {*会社情報 company_name*}
+            {*会社情報*}
             {include file="common/subheader.tpl" title=__("bba_com.community_profiles_company") target="#community_profiles_company"}
             <div id="community_profiles_company" class="in collapse">
 
-                {*会社名*}
+                {*会社名 company_name*}
                 <div class="control-group">
                     <label class="control-label cm-required---"
                            for="elm_community_profiles_company_name">{__("bba_com.community_profiles_company_name")}

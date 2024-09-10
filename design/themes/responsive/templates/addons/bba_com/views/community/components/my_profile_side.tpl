@@ -32,7 +32,7 @@
             </li>
         {/if}
         {*設⽴年⽉⽇*}
-        {if $cp_data.company_established_date}
+        {if $cp_data.company_established_date != '0000-00-00'}
             <li>
                 <span class="bba-profile-info-label">{__("bba_com.community_profiles_company_established_date")}</span>
                 <span class="bba-profile-info-value">{$cp_data.company_established_date}</span>
