@@ -103,18 +103,18 @@
         <!--        <item for="uninstall">DROP TABLE IF EXISTS ?:community_user_post_likes;</item>-->
 
         <!--友達関係 community_relationships-->
-        <item>DROP TABLE IF EXISTS ?:community_relationships;</item>
-        <item>
-            CREATE TABLE `?:community_relationships` (
-            `relationship_id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT,
-            `user_id` mediumint(8) UNSIGNED NOT NULL,
-            `friend_id` mediumint(8) UNSIGNED NOT NULL,
-            `timestamp` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
-            `status` char(1) NOT NULL DEFAULT 'A',
-            PRIMARY KEY (`relationship_id`)
-            ) ENGINE=MyISAM DEFAULT CHARSET UTF8;
-        </item>
-        <item for="uninstall">DROP TABLE IF EXISTS ?:community_relationships;</item>
+        <!--        <item>DROP TABLE IF EXISTS ?:community_relationships;</item>-->
+        <!--        <item>-->
+        <!--            CREATE TABLE `?:community_relationships` (-->
+        <!--            `relationship_id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT,-->
+        <!--            `user_id` mediumint(8) UNSIGNED NOT NULL,-->
+        <!--            `friend_id` mediumint(8) UNSIGNED NOT NULL,-->
+        <!--            `timestamp` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',-->
+        <!--            `status` char(1) NOT NULL DEFAULT 'A',-->
+        <!--            PRIMARY KEY (`relationship_id`)-->
+        <!--            ) ENGINE=MyISAM DEFAULT CHARSET UTF8;-->
+        <!--        </item>-->
+        <!--        <item for="uninstall">DROP TABLE IF EXISTS ?:community_relationships;</item>-->
 
         <!--        <item for="install">-->
         <!--            ALTER TABLE ?:orders-->

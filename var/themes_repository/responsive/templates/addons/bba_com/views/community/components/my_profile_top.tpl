@@ -55,8 +55,31 @@
     </div>
 
 
-    <div class="bba-profile-edit">
-        <a href="{"community.edit_profile"|fn_url}"
-           class="ty-btn ty-btn__primary bba-profile-edit-link">{__("bba_com.edit_profile")}</a>
+    <div class="bba-profile-right">
+        {*友達のリスト*}
+        {if $relationships}
+            <div class="bba-profile-friends">
+                <h3>{__("bba_com.community_profiles_friends_list")}</h3>
+                <ul class="bba-profile-friends-list">
+                    {assign var="profile_icon_size" value=30}
+                    {foreach from=$relationships item=relationship}
+                        {if $relationship.friend_id}
+                            <li>
+                                <a href="{"community.view_user?user_id=`$relationship.friend_id`"|fn_url}">
+                                    {include file="common/image.tpl" images=$relationship.profile_image image_width=$profile_icon_size image_height=$profile_icon_size no_ids=true class="bba-profile-friend-image"}
+                                    {*                                    <span>{$relationship.name}</span>*}
+                                </a>
+                            </li>
+                        {/if}
+                    {/foreach}
+                </ul>
+            </div>
+        {/if}
+
+        {*プロフィールの編集*}
+        <div class="bba-profile-edit">
+            <a href="{"community.edit_profile"|fn_url}"
+               class="ty-btn ty-btn__primary bba-profile-edit-link">{__("bba_com.edit_profile")}</a>
+        </div>
     </div>
 </div>

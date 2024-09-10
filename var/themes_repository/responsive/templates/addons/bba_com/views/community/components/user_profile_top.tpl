@@ -56,12 +56,17 @@
 
 
     <div class="bba-user-profile-right">
-        {*友達登録*}
-        <a href="{"community.add_friend?user_id=`$cp_data.user_id`"|fn_url}"
-           class="bba-community-add-friend-btn cm-ajax cm-post" data-user-id="{$cp_data.user_id}">
+        {if !$relationship_data}
+            {*友達登録*}
+            <a href="{"community.add_friend?friend_id=`$cp_data.user_id`"|fn_url}"
+               class="bba-community-add-friend-btn cm-post cm-confirm" data-user-id="{$cp_data.user_id}">
             <i class="ty-icon-heart"></i>
             <span>{__("bba_com.add_friend")}</span>
         </a>
+        {else}
+            <i class="ty-icon-user"></i>
+            <span>{__("bba_com.already_friend")}</span>
+        {/if}
 
         {*DM送信*}
         <a href="{"community.send_dm?user_id=`$cp_data.user_id`"|fn_url}"
@@ -70,4 +75,7 @@
             <span>{__("bba_com.send_dm")}</span>
         </a>
     </div>
+
+
+    {*    {$relationship_data|fn_print_r}*}
 </div>

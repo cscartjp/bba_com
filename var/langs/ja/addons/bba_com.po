@@ -157,7 +157,7 @@ msgctxt "Languages::bba_com.preview_profile_page"
 msgid "プレビュー"
 msgstr "プレビュー"
 
-msgctxt "Languages::bba_com.community_index"
+msgctxt "Languages::bba_com.community_home"
 msgid "コミュニティホーム"
 msgstr "コミュニティホーム"
 
@@ -244,3 +244,19 @@ msgstr "友達登録済み"
 msgctxt "Languages::bba_com.community_profiles_friends_list"
 msgid "友達リスト"
 msgstr "友達リスト"
+
+msgctxt "Languages::bba_com.no_profile_data"
+msgid "コミュニティ用のプロフィールデータがありません。設定を行なってください。"
+msgstr "コミュニティ用のプロフィールデータがありません。設定を行なってください。"
+
+msgctxt "Languages::bba_com.community_edit_profile"
+msgid "プロフィール編集"
+msgstr "プロフィール編集"
+
+msgctxt "Languages::bba_com.update_community_profile"
+msgid "プロフィールを更新"
+msgstr "プロフィールを更新"
+
+msgctxt "Languages::bba_com.community_profile_updated"
+msgid "プロフィールを更新しました"
+msgstr "プロフィールを更新しました"
