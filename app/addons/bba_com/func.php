@@ -192,6 +192,32 @@ function fn_bbcmm_get_user_comments($parent_id, $max = 3)
 }
 
 
+//友達情報を取得する
+//$user_idは、自分のユーザーID
+function fn_bbcmm_get_friends($user_id)
+{
+    $fields = [
+        'r.friend_id',
+        'cp.name',
+    ];
+
+    $join = db_quote(" LEFT JOIN ?:community_profiles AS cp ON r.friend_id = cp.user_id");
+
+    $condition = db_quote("r.user_id = ?i", $user_id);
+
+    $limit = db_quote("LIMIT 0, 5");
+
+    $friends = db_get_array("SELECT ?p FROM ?:community_relationships AS r ?p WHERE ?p ?p", implode(',', $fields), $join, $condition, $limit);
+
+    foreach ($friends as &$friend) {
+        //user_idからアイコン画像を取得する
+        $friend['profile_image'] = fn_get_image_pairs($friend['friend_id'], 'community_profile', 'M', true, true, CART_LANGUAGE);
+    }
+
+    return $friends;
+}
+
+
 //親投稿のデータを整形する
 function fn_bbcmm_format_parent_post(&$parent_post)
 {
@@ -237,7 +263,12 @@ function fn_bbcmm_get_ogp_info($url): array
         'link' => $url,
     ];
 
-    $html = file_get_contents($url);
+    $html = @file_get_contents($url);
+    if (!$html) {
+        return [];
+    }
+
+
     $doc = new DOMDocument();
     @$doc->loadHTML($html);
 

@@ -232,3 +232,15 @@ msgstr "DMを送る"
 msgctxt "Languages::bba_com.community_my_profile_products"
 msgid "このユーザーの商品"
 msgstr "このユーザーの商品"
+
+msgctxt "Languages::bba_com.friend_added"
+msgid "友達追加しました"
+msgstr "友達追加しました"
+
+msgctxt "Languages::bba_com.already_friend"
+msgid "友達登録済み"
+msgstr "友達登録済み"
+
+msgctxt "Languages::bba_com.community_profiles_friends_list"
+msgid "友達リスト"
+msgstr "友達リスト"
