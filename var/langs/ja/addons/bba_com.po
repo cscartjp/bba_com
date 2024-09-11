@@ -260,3 +260,19 @@ msgstr "プロフィールを更新"
 msgctxt "Languages::bba_com.community_profile_updated"
 msgid "プロフィールを更新しました"
 msgstr "プロフィールを更新しました"
+
+msgctxt "Languages::bba_com.my_profile"
+msgid "マイプロフィール"
+msgstr "マイプロフィール"
+
+msgctxt "Languages::bba_com.community_home"
+msgid "コミュニティホーム"
+msgstr "コミュニティホーム"
+
+msgctxt "Languages::bba_com.community_friends"
+msgid "友達"
+msgstr "友達"
+
+msgctxt "Languages::bba_com.community_groups"
+msgid "グループ"
+msgstr "グループ"

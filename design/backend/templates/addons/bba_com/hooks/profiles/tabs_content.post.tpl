@@ -37,7 +37,7 @@
                        for="elm_community_profile_image">{__("bba_com.community_profile_image")}
                     :</label>
                 <div class="controls">
-                    {include file="common/attach_images.tpl" image_name="community_profile" image_object_type="community_profile" image_pair=$cp_data.profile_image no_detailed=true hide_titles=true hide_alt=true}
+                    {include file="common/attach_images.tpl" image_name="community_profile" image_object_type="community_profile" image_pair=$cp_data.community_profile no_detailed=true hide_titles=true hide_alt=true}
                 </div>
             </div>
 

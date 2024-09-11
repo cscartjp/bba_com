@@ -1,3 +1,6 @@
+<a href="{"community.my_profile"|fn_url}"
+   class="ty-btn ty-btn__primary">{__("bba_com.my_profile")}</a>
+
 <div class="bba-profile-info">
     <ul>
         {*会社名*}

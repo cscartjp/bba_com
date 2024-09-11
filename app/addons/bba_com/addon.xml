@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <addon scheme="3.0">
     <id>bba_com</id>
-    <version>0.0.5</version>
+    <version>0.0.6</version>
     <priority>70000</priority>
     <position>0</position>
     <status>active</status>

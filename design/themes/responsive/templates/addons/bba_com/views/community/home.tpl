@@ -1,19 +1,18 @@
-<div class="row-fluid">
-    <div class="span16">
-        {include file="addons/bba_com/views/community/components/my_profile_top.tpl" cp_data=$cp_data}
-    </div>
-</div>
+{*<div class="row-fluid">*}
+{*    <div class="span16">*}
+{*        {include file="addons/bba_com/views/community/components/my_profile_top.tpl" cp_data=$cp_data}*}
+{*    </div>*}
+{*</div>*}
 
 <div class="row-fluid">
-    <div class="span6">
-        {include file="addons/bba_com/views/community/components/my_profile_side.tpl" cp_data=$cp_data}
+    <div class="span4">
+        {include file="addons/bba_com/views/community/components/home_side.tpl" cp_data=$cp_data}
     </div>
-    <div class="span10">
+    <div class="span9">
         <div class="bba-timeline">
             {* 書き込む *}
             <div class="bba-community-new-post">
                 <form action="{""|fn_url}" method="post" class="posts-form" name="post_new" id="post_new">
-
                     <input type="hidden" name="redirect_url" value="{$config.current_url}"/>
                     {* T：タイムラインに投稿する*}
                     <input type="hidden" name="new_post[post_type]" value="T"/>
@@ -69,6 +68,10 @@
             </div>
         </div>
     </div>
+    <div class="span3">
+        <h4>SIDE</h4>
+        運営からのお知らせなどを表示する
+    </div>
 </div>
 
 <script>
@@ -87,7 +90,7 @@
             }
         });
 
-        //.bba-community-post-comment-btnがクリックされたらdata-post-idを取得して、アラートとして表示する
+        //.bba-community-post-comment-btnがクリックされたらdata-post-idを取得して、コメント欄をtoggleする
         $(document).on('click', '.bba-community-post-comment-btn', function () {
             const postId = $(this).data('post-id');
             $("#comment_to_" + postId).toggle();
@@ -95,4 +98,4 @@
     })(Tygh, Tygh.$);
 </script>
 
-{capture name="mainbox_title"}{__("bba_com.community_my_profile")}{/capture}
+{capture name="mainbox_title"}{__("bba_com.community_home")}{/capture}
