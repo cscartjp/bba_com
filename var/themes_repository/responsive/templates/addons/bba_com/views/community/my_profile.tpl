@@ -9,8 +9,6 @@
         {include file="addons/bba_com/views/community/components/my_profile_side.tpl" cp_data=$cp_data}
     </div>
     <div class="span10">
-
-
         <div class="bba-timeline">
             {* 書き込む *}
             <div class="bba-community-new-post">
@@ -23,7 +21,7 @@
                     <div class="bba-community-new-post-header">
                         <div class="bba-community-new-post-user-icon">
                             {assign var="post_user_icon_size" value=60}
-                            {include file="common/image.tpl" image_width=$post_user_icon_size image_height=$post_user_icon_size images=$cp_data.profile_image no_ids=true class="bba-post-user-icon"}
+                            {include file="common/image.tpl" image_width=$post_user_icon_size image_height=$post_user_icon_size images=$cp_data.community_profile no_ids=true class="bba-post-user-icon"}
                         </div>
                         <div class="bba-community-new-post-header-name">
                             <h4>{$cp_data.name}</h4>

@@ -45,7 +45,7 @@
                        class="ty-control-group__title">{__("bba_com.community_profile_image")}</label>
                 <div>
                     {*                    {include file="common/fileuploader.tpl" var_name="community_profile"}*}
-                    {include file="addons/bba_com/views/community/components/attach_images.tpl" image_name="community_profile" image_object_type="community_profile" image_pair=$cp_data.profile_image no_detailed=true hide_titles=true hide_alt=true}
+                    {include file="addons/bba_com/views/community/components/attach_images.tpl" image_name="community_profile" image_object_type="community_profile" image_pair=$cp_data.community_profile no_detailed=true hide_titles=true hide_alt=true}
                 </div>
             </div>
 

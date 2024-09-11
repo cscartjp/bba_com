@@ -25,28 +25,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         //
         $community_profile_data['user_id'] = $user_id;
 
+        //プロフィールデータのサニタイズ
+        SecurityHelper::sanitizeObjectData('community_profile', $community_profile_data);
+
         //$community_profile_dataを?:community_profilesに保存する REPLACE INTO
         /** @noinspection PhpUndefinedFunctionInspection */
         db_query("REPLACE INTO ?:community_profiles SET ?u", $community_profile_data);
 
-
-        /** @noinspection PhpUndefinedFunctionInspection */
-        /** @noinspection PhpUndefinedConstantInspection */
-        fn_attach_image_pairs('community_profile', 'community_profile', $user_id, CART_LANGUAGE);
-
-        //community_image_1
-        fn_attach_image_pairs('community_image_1', 'community_image_1', $user_id, CART_LANGUAGE);
-        fn_attach_image_pairs('community_image_2', 'community_image_2', $user_id, CART_LANGUAGE);
-        fn_attach_image_pairs('community_image_3', 'community_image_3', $user_id, CART_LANGUAGE);
-
-//        if (defined('DEVELOPMENT')) {
-//            fn_lcjp_dev_notify([
-////                $user_id,
-////                $_FILES,
-//                $community_profile_data,
-////                $user_data
-//            ]);
-//        }
+        //画像データを保存
+        $object_types = [
+            'community_profile',
+            'community_image_1',
+            'community_image_2',
+            'community_image_3'
+        ];
+        fn_bbcmm_attach_image_pairs($user_id, $object_types);
     }
 }
 
@@ -67,12 +60,14 @@ if ($mode === 'update') {
     $cp_data = db_get_row("SELECT * FROM ?:community_profiles WHERE user_id = ?i", $user_data['user_id']);
     if ($cp_data) {
 
-        /** @noinspection PhpUndefinedFunctionInspection */
-        /** @noinspection PhpUndefinedConstantInspection */
-        $cp_data['profile_image'] = fn_get_image_pairs($user_data['user_id'], 'community_profile', 'M', true, true, CART_LANGUAGE);
-        $cp_data['community_image_1'] = fn_get_image_pairs($user_data['user_id'], 'community_image_1', 'M', true, true, CART_LANGUAGE);
-        $cp_data['community_image_2'] = fn_get_image_pairs($user_data['user_id'], 'community_image_2', 'M', true, true, CART_LANGUAGE);
-        $cp_data['community_image_3'] = fn_get_image_pairs($user_data['user_id'], 'community_image_3', 'M', true, true, CART_LANGUAGE);
+        //自分の画像データを取得
+        $object_types = [
+            'community_profile',
+            'community_image_1',
+            'community_image_2',
+            'community_image_3'
+        ];
+        fn_bbcmm_get_image_pairs($auth['user_id'], $object_types, $cp_data);
 
         Tygh::$app['view']->assign('cp_data', $cp_data);
     }
@@ -85,11 +80,6 @@ if ($mode === 'update') {
         Tygh::$app['view']->assign('company_data', $company_data);
     }
 
-//    if (defined('DEVELOPMENT')) {
-//        fn_lcjp_dev_notify([
-//            $company_data
-//        ]);
-//    }
     //「コミュニティ用プロフィール」タブを追加する
     /** @noinspection PhpUndefinedFunctionInspection */
     Registry::set('navigation.tabs.community_profile', [

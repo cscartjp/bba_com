@@ -11,6 +11,46 @@ if (!defined('BOOTSTRAP')) {
 use Tygh\Registry;
 
 
+//自分のコミュニティ情報を取得する
+function fn_bbcmm_get_my_community_info($redirect = true)
+{
+
+    $auth = &Tygh::$app['session']['auth'];
+
+    if (isset($auth['cp_data'])) {
+        return $auth['cp_data'];
+    }
+
+    //自分のデータを取得
+    /** @noinspection PhpUndefinedFunctionInspection */
+    $cp_data = db_get_row("SELECT * FROM ?:community_profiles WHERE user_id = ?i", $auth['user_id']);
+
+    //ブログスタートがセットされていない場合
+    if ($redirect && $cp_data['blog_start'] === '0000-00-00') {
+        /** @noinspection PhpUndefinedFunctionInspection */
+        fn_set_notification('E', __('error'), __('bba_com.no_profile_data'));
+        /** @noinspection PhpUndefinedFunctionInspection */
+        fn_redirect('community.edit_profile');
+        exit;
+    }
+
+    //自分の画像データを取得
+    $object_types = [
+        'community_profile',
+        'community_image_1',
+        'community_image_2',
+        'community_image_3'
+    ];
+    fn_bbcmm_get_image_pairs($auth['user_id'], $object_types, $cp_data);
+
+
+    //セッションに保存
+    $auth['cp_data'] = $cp_data;
+
+    return $cp_data;
+}
+
+
 //?:community_user_postsテーブルからデータを取得する
 //function fn_bbcmm_get_user_posts($params = []): array
 //{
@@ -39,7 +79,7 @@ function fn_bbcmm_get_user_posts(array $params = [], int $items_per_page = 0): a
     $default_params = [
         'items_per_page' => $items_per_page,
         'parent_id' => 0,
-        'user_id' => $auth['user_id'],
+//        'user_id' => $auth['user_id'],
     ];
 
     /** @noinspection PhpUndefinedConstantInspection */
@@ -73,6 +113,12 @@ function fn_bbcmm_get_user_posts(array $params = [], int $items_per_page = 0): a
     $join = '';
     $group_by = '';
 
+    //?:community_profilesをJOINして、ユーザー名を取得する
+    /** @noinspection PhpUndefinedFunctionInspection */
+    $join .= db_quote(" LEFT JOIN ?:community_profiles AS cp ON up.user_id = cp.user_id");
+    $fields[] = 'cp.name AS poster_name';
+
+
     // ソート順
     $sortings = [
         'sort_timestamp' => 'up.timestamp',
@@ -101,15 +147,16 @@ function fn_bbcmm_get_user_posts(array $params = [], int $items_per_page = 0): a
         $fields[] = db_quote("IFNULL(SUM(upl.user_id = ?i), 0) AS is_liked", $auth['user_id']);//自分()のいいねがあるかどうか
     }
 
-    //post_typeがC：コメントの場合は、?:community_profilesをJOINして、ユーザー名を取得する
-    if ($params['post_type'] === 'C') {
-        $join .= db_quote(" LEFT JOIN ?:community_profiles AS cp ON up.user_id = cp.user_id");
-        $fields[] = 'cp.name AS poster_name';
-    }
-    
 
-    /** @noinspection PhpUndefinedFunctionInspection */
-    $sorting = db_sort($params, $sortings, 'sort_timestamp', 'desc');
+    //post_typeがC：コメントの場合は、ソートを降順にする
+    if ($params['post_type'] === 'C') {
+        /** @noinspection PhpUndefinedFunctionInspection */
+        $sorting = db_sort($params, $sortings, 'sort_timestamp', 'asc');
+    } else {
+        /** @noinspection PhpUndefinedFunctionInspection */
+        $sorting = db_sort($params, $sortings, 'sort_timestamp', 'desc');
+    }
+
 
     $fields = implode(',', $fields);
 
@@ -141,7 +188,7 @@ function fn_bbcmm_get_user_posts(array $params = [], int $items_per_page = 0): a
         //投稿内容を改行をBRタグに変換する、URLをリンクに変換し、OGP情報を取得する
         //T：タイムラインに投稿した場合
         if ($params['post_type'] === 'T' && $params['parent_id'] === 0) {
-            fn_bbcmm_format_parent_post($user_post);
+            fn_bbcmm_format_post($user_post);
 
 
             //TODO コメントを取得する
@@ -184,8 +231,11 @@ function fn_bbcmm_get_user_comments($parent_id, $max = 3)
 
     //articleを整形する
     foreach ($user_comments as &$user_comment) {
+        //URLをリンクに変換する
+        fn_bbcmm_format_post($user_comment, false);
+
         //mb_strimwidth
-        $user_comment['article'] = mb_strimwidth($user_comment['article'], 0, 120, '...', 'UTF-8');
+//        $user_comment['article'] = mb_strimwidth($user_comment['article'], 0, 120, '...', 'UTF-8');
     }
 
     return $user_comments;
@@ -219,14 +269,14 @@ function fn_bbcmm_get_friends($user_id)
 
 
 //親投稿のデータを整形する
-function fn_bbcmm_format_parent_post(&$parent_post)
+function fn_bbcmm_format_post(&$parent_post, $ogp = true)
 {
     //投稿内容を改行をBRタグに変換する、URLをリンクに変換し、OGP情報を取得する
     [$article, $urls] = fn_bbcmm_convert_post_content($parent_post['article']);
     $parent_post['article'] = $article;
     $parent_post['url'] = $urls[0][0];
 
-    if ($parent_post['url']) {
+    if ($parent_post['url'] && $ogp) {
         //$parent_post['url']からOGP画像情報を取得する
         $parent_post['ogp_info'] = fn_bbcmm_get_ogp_info($parent_post['url']);
     }
@@ -293,6 +343,30 @@ function fn_bbcmm_get_ogp_info($url): array
     }
 
     return $ogp;
+}
+
+
+//指定した画像を取得する
+function fn_bbcmm_get_image_pairs(int $object_id, array $object_types, array &$profile_data): void
+{
+    foreach ($object_types as $object_type) {
+        /** @noinspection PhpUndefinedFunctionInspection */
+        /** @noinspection PhpUndefinedConstantInspection */
+        $image_data = fn_get_image_pairs($object_id, $object_type, 'M', true, true, CART_LANGUAGE);
+        if ($image_data) {
+            $profile_data[$object_type] = $image_data;
+        }
+    }
+}
+
+//指定した画像を保存する
+function fn_bbcmm_attach_image_pairs(int $object_id, array $object_types): void
+{
+    foreach ($object_types as $object_type) {
+        /** @noinspection PhpUndefinedFunctionInspection */
+        /** @noinspection PhpUndefinedConstantInspection */
+        fn_attach_image_pairs($object_type, $object_type, $object_id, CART_LANGUAGE);
+    }
 }
 
 
