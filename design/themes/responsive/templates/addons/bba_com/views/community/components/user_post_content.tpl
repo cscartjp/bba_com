@@ -4,15 +4,18 @@
     {assign var="not_my_post" value="N"}
 {/if}
 <div id="user_post_{$post_data.post_id}" class="bba-community-post">
+
+    {*    {$post_data|fn_print_r}*}
+
     <div class="bba-community-post-header">
         <div class="bba-community-post-user-icon">
-            {if $not_my_post == "Y"}<a href="{"community.view_user?user_id=`$post_data.poster_id`"|fn_url}">{/if}
+            {if $not_my_post == "Y"}<a href="{"community.view_user?user_id=`$post_data.user_id`"|fn_url}">{/if}
             {include file="common/image.tpl" image_width=$post_user_icon_size image_height=$post_user_icon_size images=$post_data.profile_image no_ids=true class="bba-post-user-icon"}
                 {if $not_my_post == "Y"}</a>{/if}
         </div>
         <div class="bba-community-post-header-name">
             <h4>
-                {if $not_my_post == "Y"}<a href="{"community.view_user?user_id=`$post_data.poster_id`"|fn_url}">{/if}
+                {if $not_my_post == "Y"}<a href="{"community.view_user?user_id=`$post_data.user_id`"|fn_url}">{/if}
                     {$post_data.poster_name}
                     {if $not_my_post == "Y"}</a>{/if}
             </h4>

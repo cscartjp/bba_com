@@ -25,14 +25,16 @@ function fn_bbcmm_get_my_community_info($redirect = true)
     /** @noinspection PhpUndefinedFunctionInspection */
     $cp_data = db_get_row("SELECT * FROM ?:community_profiles WHERE user_id = ?i", $auth['user_id']);
 
+
     //ブログスタートがセットされていない場合
-    if ($redirect && $cp_data['blog_start'] === '0000-00-00') {
+    if ($redirect && !isset($cp_data['blog_start'])) {
         /** @noinspection PhpUndefinedFunctionInspection */
         fn_set_notification('E', __('error'), __('bba_com.no_profile_data'));
         /** @noinspection PhpUndefinedFunctionInspection */
         fn_redirect('community.edit_profile');
         exit;
     }
+
 
     //自分の画像データを取得
     $object_types = [
@@ -103,6 +105,17 @@ function fn_bbcmm_get_user_posts(array $params = [], int $items_per_page = 0): a
     if ($params['post_type']) {
         /** @noinspection PhpUndefinedFunctionInspection */
         $condition .= db_quote(" AND up.post_type = ?s", $params['post_type']);
+    }
+
+
+    //$params['friend_ids']がある場合
+    if ($params['friend_ids']) {
+        /** @noinspection PhpUndefinedFunctionInspection */
+        $condition .= db_quote(" AND up.user_id IN (?a)", $params['friend_ids']);
+    } else {
+        //自分の投稿のみ
+        /** @noinspection PhpUndefinedFunctionInspection */
+        $condition .= db_quote(" AND up.user_id = ?i", $auth['user_id']);
     }
 
     if ($params['status']) {
@@ -244,23 +257,31 @@ function fn_bbcmm_get_user_comments($parent_id, $max = 3)
 
 //友達情報を取得する
 //$user_idは、自分のユーザーID
-function fn_bbcmm_get_friends($user_id)
+function fn_bbcmm_get_friends($user_id, $max = 5)
 {
     $fields = [
         'r.friend_id',
         'cp.name',
+        'cp.company_name',
     ];
 
+    /** @noinspection PhpUndefinedFunctionInspection */
     $join = db_quote(" LEFT JOIN ?:community_profiles AS cp ON r.friend_id = cp.user_id");
 
+    /** @noinspection PhpUndefinedFunctionInspection */
     $condition = db_quote("r.user_id = ?i", $user_id);
 
-    $limit = db_quote("LIMIT 0, 5");
-
+    $limit = '';
+    if ($max > 0) {
+        /** @noinspection PhpUndefinedFunctionInspection */
+        $limit = db_quote("LIMIT 0, ?i", $max);
+    }
+    /** @noinspection PhpUndefinedFunctionInspection */
     $friends = db_get_array("SELECT ?p FROM ?:community_relationships AS r ?p WHERE ?p ?p", implode(',', $fields), $join, $condition, $limit);
 
     foreach ($friends as &$friend) {
         //user_idからアイコン画像を取得する
+        /** @noinspection PhpUndefinedFunctionInspection */
         $friend['profile_image'] = fn_get_image_pairs($friend['friend_id'], 'community_profile', 'M', true, true, CART_LANGUAGE);
     }
 

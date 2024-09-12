@@ -1,10 +1,24 @@
+{if $post_data.user_id != $auth.user_id}
+    {assign var="not_my_post" value="Y"}
+{else}
+    {assign var="not_my_post" value="N"}
+{/if}
 <div id="user_post_{$post_data.post_id}" class="bba-community-post">
+
+    {*    {$post_data|fn_print_r}*}
+
     <div class="bba-community-post-header">
         <div class="bba-community-post-user-icon">
+            {if $not_my_post == "Y"}<a href="{"community.view_user?user_id=`$post_data.user_id`"|fn_url}">{/if}
             {include file="common/image.tpl" image_width=$post_user_icon_size image_height=$post_user_icon_size images=$post_data.profile_image no_ids=true class="bba-post-user-icon"}
+                {if $not_my_post == "Y"}</a>{/if}
         </div>
         <div class="bba-community-post-header-name">
-            <h4>{$cp_data.name}</h4>
+            <h4>
+                {if $not_my_post == "Y"}<a href="{"community.view_user?user_id=`$post_data.user_id`"|fn_url}">{/if}
+                    {$post_data.poster_name}
+                    {if $not_my_post == "Y"}</a>{/if}
+            </h4>
             <p>{$post_data.timestamp}</p>
         </div>
     </div>
@@ -56,7 +70,7 @@
 
             <div id="comments_area_{$post_data.post_id}" class="bba-community-post-comment-list">
                 {foreach from=$post_data.comments item=comment}
-                    {if $post_data.user_id != $comment.user_id}
+                    {if $comment.user_id != $auth.user_id}
                         {assign var="not_my_post" value="not-my-comment"}
                     {else}
                         {assign var="not_my_post" value=""}
@@ -80,7 +94,7 @@
                                         {$comment.poster_name}
                                         {if $not_my_post}</a>{/if}
                                 </h4>
-                                <p>{$comment.article}</p>
+                                <p>{$comment.article nofilter}</p>
                             </div>
 
                             <div class="bba-community-post-comment-timestamp">

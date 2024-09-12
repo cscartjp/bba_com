@@ -1,7 +1,7 @@
 <div class="bba-profile-top">
     <div class="bba-profile-image">
         {assign var="profile_image_size" value=280}
-        {include file="common/image.tpl" image_width=$profile_image_size image_height=$profile_image_size images=$cp_data.profile_image no_ids=true class="bba-profile-image-photo"}
+        {include file="common/image.tpl" image_width=$profile_image_size image_height=$profile_image_size images=$cp_data.community_profile no_ids=true class="bba-profile-image-photo"}
     </div>
 
     <div class="bba-profile-name">

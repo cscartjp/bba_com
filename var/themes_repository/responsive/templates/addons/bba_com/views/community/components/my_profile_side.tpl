@@ -1,3 +1,6 @@
+{*<a href="{"community.my_profile"|fn_url}"*}
+{*   class="ty-btn ty-btn__primary">{__("bba_com.my_profile")}</a>*}
+
 <div class="bba-profile-info">
     <ul>
         {*会社名*}
@@ -60,6 +63,25 @@
                         <a class="cm-new-window" href="{$cp_data.company_url}"
                            target="_blank">{$cp_data.company_url}</a>
                     </span>
+            </li>
+        {/if}
+        {*このユーザーの友達*}
+        {if $relationships}
+            <li>
+                <span class="bba-profile-info-label">{__("bba_com.community_friends")}</span>
+                <span class="bba-profile-info-value">
+                    <span class="bba-community-side-friends">
+                        {foreach from=$relationships item=friend}
+                            <a href="{"community.view_user?user_id=`$friend.friend_id`"|fn_url}">
+                                {assign var="friend_image_size" value=60}
+                                {include file="common/image.tpl" image_width=$friend_image_size image_height=$friend_image_size images=$friend.profile_image no_ids=true class="bba-community-friend-image-photo"}
+                            </a>
+                        {/foreach}
+                        {*全ての友達*}
+                        <a class="all-friends-link"
+                           href="{"community.friends"|fn_url}">{__("bba_com.community_all_friends")}</a>
+                    </span>
+                </span>
             </li>
         {/if}
     </ul>

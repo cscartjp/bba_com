@@ -27,6 +27,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
 
         $profile_data = $_REQUEST['profile_data'];
+        $profile_data['user_id'] = $user_id;
 
         //プロフィールデータのサニタイズ
         SecurityHelper::sanitizeObjectData('community_profile', $profile_data);
@@ -63,7 +64,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         /** @noinspection PhpUndefinedConstantInspection */
         return [CONTROLLER_STATUS_OK, 'community.my_profile'];
     }
-
 
     //add_friend
     if ($mode === 'add_friend') {
@@ -230,7 +230,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         /** @noinspection PhpUndefinedConstantInspection */
         return [CONTROLLER_STATUS_REDIRECT, $_REQUEST['redirect_url']];
     }
-
 }
 
 // ---------------------- GET routine ------------------------------------- //
@@ -250,6 +249,7 @@ if ($mode === 'home') {
     $cp_data = fn_bbcmm_get_my_community_info();
     ////////////////////////////////////////////////////////////////////////
 
+
     Tygh::$app['view']->assign('cp_data', $cp_data);
 
     //友達情報を取得
@@ -257,28 +257,27 @@ if ($mode === 'home') {
     $relationships = fn_bbcmm_get_friends($auth['user_id']);
     Tygh::$app['view']->assign('relationships', $relationships);
 
+    $friend_ids = array_column($relationships, 'friend_id');
+
+
     //全体のタイムラインを取得
 //    $params['user_id'] = $auth['user_id'];//ログインユーザーのID
     $params['post_type'] = 'T';//T: タイムライン
     $params['disp_like'] = true;//いいねボタン
 
+    if ($friend_ids) {
+        $params['friend_ids'] = $friend_ids;
+    }
+
+
     [$user_posts, $search] = fn_bbcmm_get_user_posts($params, Registry::get('settings.Appearance.elements_per_page'));
-
-//    if (defined('DEVELOPMENT')) {
-//        fn_lcjp_dev_notify([
-//            $user_posts, $search, $relationships
-//        ]);
-//    }
-
 
     Tygh::$app['view']->assign('user_posts', $user_posts);
     Tygh::$app['view']->assign('search', $search);
 
-
     //パンくずリストを追加
     /** @noinspection PhpUndefinedFunctionInspection */
     fn_add_breadcrumb(__('bba_com.community_home'));
-
 }
 
 
@@ -357,25 +356,21 @@ if ($mode === 'view_user') {
         return [CONTROLLER_STATUS_NO_PAGE];
     }
 
+
     //このユーザーのcompany_idを取得
+    /** @noinspection PhpUndefinedFunctionInspection */
     $cp_data['company_id'] = db_get_field("SELECT company_id FROM ?:users WHERE user_id = ?i", $params['user_id']);
 
-    //自分の画像データを取得
+
+    //ユーザーの画像データを取得
     $object_types = [
         'community_profile',
         'community_image_1',
         'community_image_2',
         'community_image_3'
     ];
-    fn_bbcmm_get_image_pairs($auth['user_id'], $object_types, $cp_data);
+    fn_bbcmm_get_image_pairs($params['user_id'], $object_types, $cp_data);
 
-//    //画像データを取得
-//    /** @noinspection PhpUndefinedFunctionInspection */
-//    /** @noinspection PhpUndefinedConstantInspection */
-//    $cp_data['community_profile'] = fn_get_image_pairs($cp_data['user_id'], 'community_profile', 'M', true, true, CART_LANGUAGE);
-//    $cp_data['community_image_1'] = fn_get_image_pairs($cp_data['user_id'], 'community_image_1', 'M', true, true, CART_LANGUAGE);
-//    $cp_data['community_image_2'] = fn_get_image_pairs($cp_data['user_id'], 'community_image_2', 'M', true, true, CART_LANGUAGE);
-//    $cp_data['community_image_3'] = fn_get_image_pairs($cp_data['user_id'], 'community_image_3', 'M', true, true, CART_LANGUAGE);
 
     //このユーザーのタイムラインを取得
     $params['post_type'] = 'T';//T: タイムライン
@@ -388,6 +383,9 @@ if ($mode === 'view_user') {
     /** @noinspection PhpUndefinedFunctionInspection */
     $relationship_data = db_get_row("SELECT * FROM ?:community_relationships WHERE user_id = ?i AND friend_id = ?i", $auth['user_id'], $cp_data['user_id']);
 
+    //友達情報を取得
+    $relationships = fn_bbcmm_get_friends($cp_data['user_id']);
+
     //パンくずリストを追加
     /** @noinspection PhpUndefinedFunctionInspection */
     fn_add_breadcrumb(__('bba_com.community_home'), 'community.home');
@@ -399,6 +397,7 @@ if ($mode === 'view_user') {
     Tygh::$app['view']->assign('user_posts', $user_posts);
     Tygh::$app['view']->assign('search', $search);
     Tygh::$app['view']->assign('relationship_data', $relationship_data);
+    Tygh::$app['view']->assign('relationships', $relationships);
 }
 
 
@@ -412,19 +411,6 @@ if ($mode === 'edit_profile') {
     }
 
     $params = $_REQUEST;
-
-//    //コミュニティプロフィールデータを取得
-//    /** @noinspection PhpUndefinedFunctionInspection */
-//    $cp_data = db_get_row("SELECT * FROM ?:community_profiles WHERE user_id = ?i", $auth['user_id']);
-//
-//    //自分の画像データを取得
-//    $object_types = [
-//        'community_profile',
-//        'community_image_1',
-//        'community_image_2',
-//        'community_image_3'
-//    ];
-//    fn_bbcmm_get_image_pairs($auth['user_id'], $object_types, $cp_data);
 
     //自分のデータを取得////////////////////////////////////////////////////
     $cp_data = fn_bbcmm_get_my_community_info(false);
@@ -443,6 +429,61 @@ if ($mode === 'edit_profile') {
     fn_add_breadcrumb(__('bba_com.community_edit_profile'));
 }
 
+//friends
+if ($mode === 'friends') {
+
+    //ログインしていない場合はログインページへ
+    if (empty($auth['user_id'])) {
+        /** @noinspection PhpUndefinedConstantInspection */
+        return array(CONTROLLER_STATUS_REDIRECT, 'auth.login_form?return_url=' . urlencode(Registry::get('config.current_url')));
+    }
+
+    $params = $_REQUEST;
+
+    //自分のデータを取得////////////////////////////////////////////////////
+    $cp_data = fn_bbcmm_get_my_community_info();
+    ////////////////////////////////////////////////////////////////////////
+
+    Tygh::$app['view']->assign('cp_data', $cp_data);
+
+    //友達情報を取得
+    $relationships = fn_bbcmm_get_friends($auth['user_id'], 0);
+    Tygh::$app['view']->assign('relationships', $relationships);
+
+    //パンくずリストを追加
+    /** @noinspection PhpUndefinedFunctionInspection */
+    fn_add_breadcrumb(__('bba_com.community_home'), 'community.home');
+    /** @noinspection PhpUndefinedFunctionInspection */
+    fn_add_breadcrumb(__('bba_com.community_friends'));
+}
+
+
+//search
+if ($mode === 'search') {
+
+    //ログインしていない場合はログインページへ
+    if (empty($auth['user_id'])) {
+        /** @noinspection PhpUndefinedConstantInspection */
+        return array(CONTROLLER_STATUS_REDIRECT, 'auth.login_form?return_url=' . urlencode(Registry::get('config.current_url')));
+    }
+
+    $params = $_REQUEST;
+
+    //自分のデータを取得////////////////////////////////////////////////////
+    $cp_data = fn_bbcmm_get_my_community_info();
+    ////////////////////////////////////////////////////////////////////////
+
+    Tygh::$app['view']->assign('cp_data', $cp_data);
+
+
+    //検索結果を取得する
+    
+
+    /** @noinspection PhpUndefinedFunctionInspection */
+    fn_add_breadcrumb(__('bba_com.community_home'), 'community.home');
+    /** @noinspection PhpUndefinedFunctionInspection */
+    fn_add_breadcrumb(__('bba_com.community_search'));
+}
 
 //GET routineの場合は404
 if ($mode === 'preview_as_user') {
