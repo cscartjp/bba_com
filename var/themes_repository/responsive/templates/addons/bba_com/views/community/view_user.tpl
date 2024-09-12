@@ -32,12 +32,14 @@
     <div class="span6">
 
         {* このユーザーが出品した商品を確認するボタン companies.products&company_id=X*}
+        {if $cp_data.company_id != COMMUNITY_ONLY_COMPANY_ID}
         <a href="{"companies.products&company_id=`$cp_data.company_id`"|fn_url}" class="btn btn-primary">
             {__("bba_com.community_my_profile_products")}
         </a>
+        {/if}
 
 
-        {include file="addons/bba_com/views/community/components/my_profile_side.tpl" cp_data=$cp_data}
+        {include file="addons/bba_com/views/community/components/user_profile_side.tpl" cp_data=$cp_data}
     </div>
     <div class="span10">
         <div class="bba-timeline">

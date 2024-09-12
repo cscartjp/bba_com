@@ -64,6 +64,7 @@
 
   }
 
+
   .bba-profile-right {
 
     .bba-profile-friends {
@@ -108,6 +109,46 @@
   }
 
 }
+
+.bba-home-side-left {
+  //padding-top: 20px;
+
+  li {
+    margin-bottom: 10px;
+    border-bottom: 1px solid #ddd;
+
+    a {
+      display: inline-block;
+      margin-bottom: 10px;
+      font-size: 1em;
+    }
+  }
+
+  .bba-profile-image {
+    display: flex;
+    align-items: center;
+
+    .bba-profile-image-photo {
+      //  画像をまるくする
+      border-radius: 50%;
+      //width: 100px;
+      //height: 100px;
+      //margin-right: 20px;
+      border: 2px solid #ddd;
+    }
+
+    h2.bba-profile-fullname {
+      margin: 0 !important;
+
+      a {
+        font-size: 0.6em;
+        //line-height: 1.5em;
+        margin: 0 0 0 10px;
+      }
+    }
+  }
+}
+
 
 .bba-profile-info {
   ul {
@@ -206,6 +247,7 @@
 
     .buttons-container {
       background-color: inherit;
+      margin: 0;
 
       .ty-btn__secondary.bba-community-new-post-btn {
         width: inherit !important;
@@ -248,6 +290,11 @@
           line-height: 1em;
           margin: 0;
           font-weight: bold;
+
+          a {
+            font-size: 1em;
+            font-weight: bold;
+          }
         }
 
         p {
@@ -381,6 +428,8 @@
               p {
                 font-size: 0.8em;
                 line-height: 1.5em;
+                //折り返す
+                word-break: break-all;
               }
             }
 
@@ -455,15 +504,6 @@
     border-bottom: 1px solid #ddd;
   }
 
-
-  .bba-community-images {
-    display: flex;
-
-    .bba-community-image {
-
-    }
-  }
-
   .community-images {
     display: flex;
     flex-wrap: wrap;
@@ -479,3 +519,73 @@
   }
 }
 
+.bba-community-images {
+  display: flex;
+
+  .bba-community-image {
+
+  }
+}
+
+.bba-community-friends {
+  .bba-community-friend {
+    margin-bottom: 20px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid #ddd;
+
+    a {
+      display: flex;
+      align-items: center;
+    }
+
+    .bba-community-friend-image-photo {
+      border-radius: 50%;
+      margin-right: 10px;
+    }
+
+    .bba-community-friend-profile {
+      flex-grow: 1;
+
+      h4 {
+        font-size: 1em;
+        font-weight: bold;
+        margin: 0;
+        padding: 0;
+      }
+
+      p {
+        font-size: 0.8em;
+        margin: 0;
+        padding: 0;
+      }
+    }
+  }
+}
+
+.bba-community-side-friends {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: end;
+
+  a {
+    display: block;
+    margin-right: -10px;
+
+    .bba-community-friend-image-photo {
+      border: 2px solid #ddd;
+      border-radius: 50%;
+      box-shadow: 0 0 5px rgba(0, 0, 0, 0.5);
+    }
+  }
+
+  a.all-friends-link {
+    font-size: 0.8em !important;
+    padding-left: 17px;
+  }
+
+}
+
+.community-general-side {
+  padding: 0;
+  margin-bottom: 20px;
+}

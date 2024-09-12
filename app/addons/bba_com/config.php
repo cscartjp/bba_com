@@ -8,4 +8,5 @@ if (!defined('BOOTSTRAP')) {
     die('Access denied');
 }
 
-//define('TEST_CONSTANTS', 'test');
+//コミュニティーのみの会社ID
+define('COMMUNITY_ONLY_COMPANY_ID', 22);
