@@ -324,27 +324,40 @@
         box-shadow: 0 0 5px rgba(0, 0, 0, 0.5);
 
         a {
-          display: block;
+          display: flex;
+          align-items: flex-start;
+          gap: 10px;
           text-decoration: none;
 
-          .bba-community-post-ogp-image {
+          .bba-community-ogp-image {
+            //flex内の幅を固定
+            flex-basis: 400px;
+
+
             display: block;
-            width: 100%;
-            height: auto;
+            //width: 100%;
+            //height: auto;
+            img.lazyload {
+              display: block;
+              width: 200px;
+            }
           }
 
-          .bba-community-ogp-title {
-            font-size: 0.9em;
-            line-height: 1.2em;
-            font-weight: bold;
-            margin-top: 10px;
-            //margin-bottom: 10px;
-          }
+          .bba-community-ogp-details {
+            .bba-community-ogp-title {
+              font-size: 0.8em;
+              line-height: 1.2em;
+              font-weight: bold;
+              padding-top: 0;
+              //margin-top: 10px;
+              //margin-bottom: 10px;
+            }
 
-          .bba-community-ogp-description {
-            font-size: 0.8em;
-            line-height: 1.4em;
-            //margin-bottom: 10px;
+            .bba-community-ogp-description {
+              font-size: 0.7em;
+              line-height: 1.4em;
+              //margin-bottom: 10px;
+            }
           }
         }
 
@@ -502,7 +515,12 @@
   }
 }
 
-.bba-com-profile {
+.bba-com-group {
+  margin-top: 0;
+}
+
+.bba-com-profile,
+.bba-com-group {
 
   .ty-subheader {
     font-size: 1.5em;
@@ -602,18 +620,107 @@
     margin-bottom: 10px;
   }
 
-  input.ty-search-block__input {
+  .ty-search-block {
+    position: relative;
 
-  }
+    > form {
+      padding-right: 0;
+    }
 
-  .ty-search-magnifier {
-    width: 42px !important;
-    right: 10px;
+    .ty-search-block__input {
+      width: 100%;
+    }
+
+    .ty-search-magnifier {
+      position: absolute;
+      width: 42px !important;
+      right: -10px;
+    }
   }
 }
 
 .bba-com-search-result {
   .ty-tabs__content {
     background-color: inherit;
+  }
+}
+
+.bba-community-create {
+  text-align: right;
+  margin-bottom: 20px;
+
+  .bba-group-edit-link {
+    display: inline-block !important;
+    width: inherit !important;
+  }
+}
+
+.bba-community-groups {
+  .bba-community-group {
+    margin-bottom: 20px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid #ddd;
+
+    a {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .bba-community-group-image-icon {
+      flex-basis: 120px;
+      border-radius: 50%;
+      margin-right: 10px;
+      border: 2px solid #ddd;
+    }
+
+    .bba-community-group-detail {
+      //flex-grow: 2;
+
+      .bba-community-group-type {
+        display: inline-block;
+        font-size: 0.8em;
+        background-color: #e8a640;
+        padding: 5px;
+        margin-bottom: 5px;
+        border-radius: 5px;
+      }
+
+      .bba-community-group-type-p {
+        background-color: #e8a640;
+      }
+
+      .bba-community-group-type-i {
+        background-color: #234b85;
+        color: #fff;
+      }
+
+      h4 {
+        font-size: 1em;
+        font-weight: bold;
+        margin: 0;
+        padding: 0;
+      }
+
+      p {
+        font-size: 0.8em;
+        margin: 0;
+        padding: 0;
+      }
+    }
+  }
+}
+
+.bba-community-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  //中央寄せ
+  justify-content: center;
+}
+
+.bba-group-side-left {
+  .bba-group-description {
+    font-size: 0.8em;
   }
 }

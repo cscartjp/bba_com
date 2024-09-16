@@ -324,3 +324,51 @@ msgstr "お知らせ"
 msgctxt "Languages::bba_com.tab_people"
 msgid "人物 ([count])"
 msgstr "人物 ([count])"
+
+msgctxt "Languages::bba_com.create_group"
+msgid "グループ作成"
+msgstr "グループ作成"
+
+msgctxt "Languages::bba_com.community_group_create"
+msgid "グループ作成"
+msgstr "グループ作成"
+
+msgctxt "Languages::bba_com.group_icon"
+msgid "グループアイコン"
+msgstr "グループアイコン"
+
+msgctxt "Languages::bba_com.group_name"
+msgid "グループ名"
+msgstr "グループ名"
+
+msgctxt "Languages::bba_com.group_description"
+msgid "グループ説明"
+msgstr "グループ説明"
+
+msgctxt "Languages::bba_com.group_type"
+msgid "グループタイプ"
+msgstr "グループタイプ"
+
+msgctxt "Languages::bba_com.group_type_public"
+msgid "公開制"
+msgstr "公開制"
+
+msgctxt "Languages::bba_com.group_type_invite"
+msgid "招待制"
+msgstr "招待制"
+
+msgctxt "Languages::bba_com.create_group_btn"
+msgid "グループを作成する"
+msgstr "グループを作成する"
+
+msgctxt "Languages::bba_com.group_created"
+msgid "グループを作成しました"
+msgstr "グループを作成しました"
+
+msgctxt "Languages::bba_com.group_not_created"
+msgid "グループの作成に失敗しました"
+msgstr "グループの作成に失敗しました"
+
+msgctxt "Languages::bba_com.group_post_article_ph"
+msgid "グループに投稿しよう！"
+msgstr "グループに投稿しよう！"

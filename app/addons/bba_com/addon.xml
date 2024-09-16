@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <addon scheme="3.0">
     <id>bba_com</id>
-    <version>0.0.6</version>
+    <version>0.0.7</version>
     <priority>70000</priority>
     <position>0</position>
     <status>active</status>
@@ -78,6 +78,7 @@
         <!--            `post_id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT,-->
         <!--            `parent_id` int(11) UNSIGNED NOT NULL DEFAULT '0',-->
         <!--            `user_id` mediumint(8) UNSIGNED NOT NULL,-->
+        <!--            `object_id` int(8) UNSIGNED NOT NULL DEFAULT '0',-->
         <!--            `post_type` char(1) NOT NULL DEFAULT 'T',-->
         <!--            `article` text NOT NULL,-->
         <!--            `timestamp` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',-->
@@ -115,6 +116,24 @@
         <!--            ) ENGINE=MyISAM DEFAULT CHARSET UTF8;-->
         <!--        </item>-->
         <!--        <item for="uninstall">DROP TABLE IF EXISTS ?:community_relationships;</item>-->
+
+
+        <!--グループ community_groups-->
+        <!--        <item>DROP TABLE IF EXISTS ?:community_groups;</item>-->
+        <!--        <item>-->
+        <!--            CREATE TABLE `?:community_groups` (-->
+        <!--            `group_id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT,-->
+        <!--            `create_user_id` mediumint(8) UNSIGNED NOT NULL,-->
+        <!--            `group` varchar(128) NOT NULL DEFAULT '',-->
+        <!--            `description` text NOT NULL DEFAULT '',-->
+        <!--            `type` char(1) NOT NULL DEFAULT 'P',-->
+        <!--            `timestamp` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',-->
+        <!--            `status` char(1) NOT NULL DEFAULT 'A',-->
+        <!--            PRIMARY KEY (`group_id`)-->
+        <!--            ) ENGINE=MyISAM DEFAULT CHARSET UTF8;-->
+        <!--        </item>-->
+        <!--        <item for="uninstall">DROP TABLE IF EXISTS ?:community_groups;</item>-->
+
 
         <!--        <item for="install">-->
         <!--            ALTER TABLE ?:orders-->

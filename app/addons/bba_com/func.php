@@ -159,8 +159,6 @@ function fn_bbcmm_get_user_posts(array $params = [], int $items_per_page = 0): a
     }
     $params = array_merge($default_params, $params);
 
-//    $params['parent_id'] = $params['parent_id'] ?? 0;
-
     $fields = ['up.*'];
 
     $condition = '1';
@@ -168,6 +166,12 @@ function fn_bbcmm_get_user_posts(array $params = [], int $items_per_page = 0): a
 //    if ($params['parent_id']) {}
     /** @noinspection PhpUndefinedFunctionInspection */
     $condition .= db_quote(" AND up.parent_id = ?i", $params['parent_id']);
+
+    //object_idがある場合
+    if ($params['object_id']) {
+        /** @noinspection PhpUndefinedFunctionInspection */
+        $condition .= db_quote(" AND up.object_id = ?i", $params['object_id']);
+    }
 
     //cq：検索クエリ LIKE
     if ($params['cq']) {
@@ -218,10 +222,9 @@ function fn_bbcmm_get_user_posts(array $params = [], int $items_per_page = 0): a
         'sort_timestamp' => 'up.timestamp',
     ];
 
-    //T：タイムラインに投稿した場合(親投稿)
-    if ($params['disp_like'] === true && $params['post_type'] === 'T' && $params['parent_id'] === 0) {
-
-
+    //親投稿の場合
+//    if ($params['disp_like'] === true && $params['post_type'] === 'T' && $params['parent_id'] === 0) {
+    if ($params['disp_like'] === true && $params['parent_id'] === 0) {
         //タイムラインの場合のみuser_id
         if ($params['user_id']) {
             /** @noinspection PhpUndefinedFunctionInspection */
@@ -238,6 +241,7 @@ function fn_bbcmm_get_user_posts(array $params = [], int $items_per_page = 0): a
         $group_by = 'GROUP BY up.post_id';
 
         //自分()のいいねがあるかどうか
+        /** @noinspection PhpUndefinedFunctionInspection */
         $fields[] = db_quote("IFNULL(SUM(upl.user_id = ?i), 0) AS is_liked", $auth['user_id']);//自分()のいいねがあるかどうか
     }
 
@@ -258,7 +262,6 @@ function fn_bbcmm_get_user_posts(array $params = [], int $items_per_page = 0): a
     $limit = '';
     if (!empty($params['items_per_page'])) {
         /** @noinspection PhpUndefinedFunctionInspection */
-//        $params['total_items'] = db_get_field("SELECT COUNT(*) FROM ?:community_user_posts AS up $join WHERE ?p ?p ?p", $condition, $group_by, $limit);
         $params['total_items'] = db_get_field("SELECT COUNT(*) FROM ?:community_user_posts AS up WHERE ?p", $condition);
         /** @noinspection PhpUndefinedFunctionInspection */
         $limit = db_paginate($params['page'], $params['items_per_page']);
@@ -280,8 +283,9 @@ function fn_bbcmm_get_user_posts(array $params = [], int $items_per_page = 0): a
 
 
         //投稿内容を改行をBRタグに変換する、URLをリンクに変換し、OGP情報を取得する
-        //T：タイムラインに投稿した場合
-        if ($params['post_type'] === 'T' && $params['parent_id'] === 0) {
+        //親記事の場合
+//        if ($params['post_type'] === 'T' && $params['parent_id'] === 0) {
+        if ($params['parent_id'] === 0) {
             fn_bbcmm_format_post($user_post);
 
 
@@ -295,22 +299,6 @@ function fn_bbcmm_get_user_posts(array $params = [], int $items_per_page = 0): a
 
     return [$user_posts, $params];
 }
-
-////プロフィールアイコン取得
-//function fn_bbcmm_get_profile_image($user_posts)
-//{
-//    $community_profile_images = [];
-//    foreach ($user_posts as &$user_post) {
-//        if (!$community_profile_images[$user_post['user_id']]) {
-//            //user_idからアイコン画像を取得する
-//            /** @noinspection PhpUndefinedFunctionInspection */
-//            $community_profile_images[$user_post['user_id']] = fn_get_image_pairs($user_post['user_id'], 'community_profile', 'M', true, true, CART_LANGUAGE);
-//        }
-//        $user_post['profile_image'] = $community_profile_images[$user_post['user_id']];
-//    }
-//
-//    return $user_posts;
-//}
 
 //コメントを取得する（最大3件）
 function fn_bbcmm_get_user_comments($parent_id, $max = 3)
@@ -367,6 +355,97 @@ function fn_bbcmm_get_friends($user_id, $max = 5)
     }
 
     return $friends;
+}
+
+
+//グループ一覧を取得する
+function fn_bbcmm_get_groups($params = [], int $items_per_page = 0): array
+{
+    $auth = Tygh::$app['session']['auth'];
+
+    $default_params = [
+        'items_per_page' => $items_per_page,
+//        'my_user_id' => $auth['user_id'],
+    ];
+
+    /** @noinspection PhpUndefinedConstantInspection */
+    if (AREA === 'C') {
+        $default_params['status'] = 'A';
+    }
+
+    $params = array_merge($default_params, $params);
+
+    $fields = ['cg.*'];
+
+    $condition = '1';
+
+    //cq：検索クエリ LIKE
+    if ($params['cq']) {
+        /** @noinspection PhpUndefinedFunctionInspection */
+        $condition .= db_quote(" AND cg.name LIKE ?l", '%' . trim($params['cq']) . '%');
+    }
+
+    $join = '';
+    $group_by = '';
+
+    // ソート順
+    $sortings = [
+        'sort_group_id' => 'cg.group_id',
+    ];
+
+    /** @noinspection PhpUndefinedFunctionInspection */
+    $sorting = db_sort($params, $sortings, 'sort_group_id', 'asc');
+
+    $fields = implode(',', $fields);
+
+    $limit = '';
+    if (!empty($params['items_per_page'])) {
+        /** @noinspection PhpUndefinedFunctionInspection */
+        $params['total_items'] = db_get_field("SELECT COUNT(*) FROM ?:community_groups AS cg $join WHERE ?p", $condition);
+        /** @noinspection PhpUndefinedFunctionInspection */
+        $limit = db_paginate($params['page'], $params['items_per_page']);
+    }
+
+    /** @noinspection PhpUndefinedFunctionInspection */
+    $groups = db_get_array("SELECT $fields FROM ?:community_groups AS cg $join WHERE ?p ?p ?p", $condition, $group_by, $sorting, $limit);
+
+    //グループアイコン取得
+    $group_images = [];
+    foreach ($groups as &$group) {
+        //group_idからアイコン画像を取得する
+        /** @noinspection PhpUndefinedFunctionInspection */
+        $group_images[$group['group_id']] = fn_get_image_pairs($group['group_id'], 'group_icon', 'M', true, true, CART_LANGUAGE);
+        $group['group_icon'] = $group_images[$group['group_id']];
+    }
+
+    return [$groups, $params];
+}
+
+//fn_bbcmm_get_group_data は、引数（グループID）からグループに関する情報を取得する
+function fn_bbcmm_get_group_data(int $group_id): array
+{
+    $fields = [
+        'cg.*',
+    ];
+
+    /** @noinspection PhpUndefinedFunctionInspection */
+    $condition = db_quote("group_id = ?i", $group_id);
+
+    /** @noinspection PhpUndefinedConstantInspection */
+    if (AREA === 'C') {
+        /** @noinspection PhpUndefinedFunctionInspection */
+        $condition .= db_quote(" AND status = ?s", 'A');
+    }
+
+    $fields = implode(',', $fields);
+
+    /** @noinspection PhpUndefinedFunctionInspection */
+    $group_data = db_get_row("SELECT $fields FROM ?:community_groups AS cg WHERE 1 AND ?p", $condition);
+
+    //グループアイコン取得
+    fn_bbcmm_get_image_pairs($group_id, ['group_icon'], $group_data);
+
+    return $group_data;
 }
 
 
