@@ -290,6 +290,37 @@ msgid "コミュニティ検索"
 msgstr "コミュニティ検索"
 
 msgctxt "Languages::bba_com.search_result"
-msgid "検索結果"
-msgstr "検索結果"
+msgid "コミュニティ検索結果"
+msgstr "コミュニティ検索結果"
 
+msgctxt "Languages::bba_com.people_search_result"
+msgid "コミュニティメンバー検索結果"
+msgstr "コミュニティメンバー検索結果"
+
+msgctxt "Languages::bba_com.community_search"
+msgid "コミュニティ検索"
+msgstr "コミュニティ検索"
+
+msgctxt "Languages::bba_com.search_query_too_short"
+msgid "検索キーワードが短すぎます。2文字以上で検索してください。"
+msgstr "検索キーワードが短すぎます。2文字以上で検索してください。"
+
+msgctxt "Languages::bba_com.posts"
+msgid "投稿"
+msgstr "投稿"
+
+msgctxt "Languages::bba_com.tab_posts"
+msgid "投稿 ([count])"
+msgstr "投稿 ([count])"
+
+msgctxt "Languages::bba_com.people"
+msgid "人物"
+msgstr "人物"
+
+msgctxt "Languages::bba_com.information"
+msgid "お知らせ"
+msgstr "お知らせ"
+
+msgctxt "Languages::bba_com.tab_people"
+msgid "人物 ([count])"
+msgstr "人物 ([count])"

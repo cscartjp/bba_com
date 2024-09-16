@@ -280,7 +280,6 @@ if ($mode === 'home') {
     fn_add_breadcrumb(__('bba_com.community_home'));
 }
 
-
 //community.my_profile
 if ($mode === 'my_profile') {
 
@@ -322,7 +321,6 @@ if ($mode === 'my_profile') {
     Tygh::$app['view']->assign('search', $search);
     Tygh::$app['view']->assign('relationships', $relationships);
 }
-
 
 //community.view_user 他のユーザーのプロフィールを表示
 if ($mode === 'view_user') {
@@ -400,7 +398,6 @@ if ($mode === 'view_user') {
     Tygh::$app['view']->assign('relationships', $relationships);
 }
 
-
 //community.edit_profile
 if ($mode === 'edit_profile') {
 
@@ -468,6 +465,10 @@ if ($mode === 'search') {
     }
 
     $params = $_REQUEST;
+    $params['search_all'] = true;
+
+    //$paramsをサニタイズ
+    SecurityHelper::sanitizeObjectData('community_user_posts', $params);
 
     //自分のデータを取得////////////////////////////////////////////////////
     $cp_data = fn_bbcmm_get_my_community_info();
@@ -476,8 +477,48 @@ if ($mode === 'search') {
     Tygh::$app['view']->assign('cp_data', $cp_data);
 
 
-    //検索結果を取得する
-    
+    //投稿の検索結果を取得する
+    $params['post_type'] = 'T';//T: タイムライン
+    $params['disp_like'] = true;//いいねボタンを表示するか
+
+    $match_posts = "0";
+    $match_people = "0";
+
+
+    //$params['cq']が2文字以下の場合は、検索結果を表示しない
+    if (mb_strlen($params['cq']) < 2) {
+
+        /** @noinspection PhpUndefinedFunctionInspection */
+        fn_set_notification('W', __('warning'), __('bba_com.search_query_too_short'));
+
+        Tygh::$app['view']->assign('user_posts', null);
+        Tygh::$app['view']->assign('search', $params);
+    } else {
+        //投稿の検索結果を取得
+        [$user_posts, $search] = fn_bbcmm_get_user_posts($params, Registry::get('settings.Appearance.elements_per_page'));
+        $match_posts = $search['total_items'];
+
+        //人物の検索結果を取得
+        [$people, $people_search] = fn_bbcmm_search_community_profiles($params, 999);
+        $match_people = $people_search['total_items'];
+
+        Tygh::$app['view']->assign('user_posts', $user_posts);
+        Tygh::$app['view']->assign('people', $people);
+        Tygh::$app['view']->assign('search', $search);
+        Tygh::$app['view']->assign('people_search', $people_search);
+    }
+
+    Registry::set('navigation.tabs', [
+        'posts' => [
+            'title' => __('bba_com.tab_posts', ['[count]' => $match_posts]),
+            'js' => true
+        ],
+        'people' => [
+            'title' => __('bba_com.tab_people', ['[count]' => $match_people]),
+            'js' => true
+        ]
+    ]);
+
 
     /** @noinspection PhpUndefinedFunctionInspection */
     fn_add_breadcrumb(__('bba_com.community_home'), 'community.home');
@@ -487,5 +528,6 @@ if ($mode === 'search') {
 
 //GET routineの場合は404
 if ($mode === 'preview_as_user') {
+    /** @noinspection PhpUndefinedConstantInspection */
     return [CONTROLLER_STATUS_NO_PAGE];
 }

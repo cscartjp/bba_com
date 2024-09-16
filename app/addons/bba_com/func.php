@@ -73,6 +73,75 @@ function fn_bbcmm_get_my_community_info($redirect = true)
 //    return [$posts, $params];
 //}
 
+//コミュニティプロフィールの検索
+function fn_bbcmm_search_community_profiles($params = [], int $items_per_page = 0): array
+{
+    $auth = Tygh::$app['session']['auth'];
+
+    $default_params = [
+        'items_per_page' => $items_per_page,
+        'parent_id' => 0,
+        'my_user_id' => $auth['user_id'],
+    ];
+
+    /** @noinspection PhpUndefinedConstantInspection */
+    if (AREA === 'C') {
+        $default_params['status'] = 'A';
+    }
+
+    $params = array_merge($default_params, $params);
+
+    $fields = ['cp.*'];
+
+    $condition = '1';
+
+    //自分のユーザーIDを除外する
+    /** @noinspection PhpUndefinedFunctionInspection */
+    $condition .= db_quote(" AND cp.user_id != ?i", $params['my_user_id']);
+
+    //cq：検索クエリ LIKE
+    if ($params['cq']) {
+        /** @noinspection PhpUndefinedFunctionInspection */
+        $condition .= db_quote(" AND cp.name LIKE ?l", '%' . trim($params['cq']) . '%');
+    }
+
+    $join = '';
+    $group_by = '';
+
+    // ソート順
+    $sortings = [
+        'sort_user_id' => 'cp.user_id',
+    ];
+
+    /** @noinspection PhpUndefinedFunctionInspection */
+    $sorting = db_sort($params, $sortings, 'sort_user_id', 'asc');
+
+    $fields = implode(',', $fields);
+
+    $limit = '';
+    if (!empty($params['items_per_page'])) {
+        /** @noinspection PhpUndefinedFunctionInspection */
+        $params['total_items'] = db_get_field("SELECT COUNT(*) FROM ?:community_profiles AS cp WHERE ?p", $condition);
+        /** @noinspection PhpUndefinedFunctionInspection */
+        $limit = db_paginate($params['page'], $params['items_per_page']);
+    }
+
+    /** @noinspection PhpUndefinedFunctionInspection */
+    $community_profiles = db_get_array("SELECT $fields FROM ?:community_profiles AS cp WHERE ?p ?p ?p", $condition, $group_by, $sorting, $limit);
+
+    //プロフィールアイコン取得
+    $community_profile_images = [];
+    foreach ($community_profiles as &$community_profile) {
+        //user_idからアイコン画像を取得する
+        /** @noinspection PhpUndefinedFunctionInspection */
+        $community_profile_images[$community_profile['user_id']] = fn_get_image_pairs($community_profile['user_id'], 'community_profile', 'M', true, true, CART_LANGUAGE);
+        $community_profile['profile_image'] = $community_profile_images[$community_profile['user_id']];
+    }
+
+    return [$community_profiles, $params];
+}
+
+
 //?:community_user_postsテーブルからデータを取得する
 function fn_bbcmm_get_user_posts(array $params = [], int $items_per_page = 0): array
 {
@@ -100,22 +169,34 @@ function fn_bbcmm_get_user_posts(array $params = [], int $items_per_page = 0): a
     /** @noinspection PhpUndefinedFunctionInspection */
     $condition .= db_quote(" AND up.parent_id = ?i", $params['parent_id']);
 
+    //cq：検索クエリ LIKE
+    if ($params['cq']) {
+        /** @noinspection PhpUndefinedFunctionInspection */
+        $condition .= db_quote(" AND up.article LIKE ?l", '%' . trim($params['cq']) . '%');
+    }
 
-    //
+
+    //投稿タイプ
     if ($params['post_type']) {
         /** @noinspection PhpUndefinedFunctionInspection */
         $condition .= db_quote(" AND up.post_type = ?s", $params['post_type']);
     }
 
+    //user_idがある場合
+    if ($params['user_id']) {
+        /** @noinspection PhpUndefinedFunctionInspection */
+        $condition .= db_quote(" AND up.user_id = ?i", $params['user_id']);
+    }
+
 
     //$params['friend_ids']がある場合
     if ($params['friend_ids']) {
+
+        //$params['friend_ids']に自分のIDを追加する
+        $params['friend_ids'][] = $auth['user_id'];
+
         /** @noinspection PhpUndefinedFunctionInspection */
         $condition .= db_quote(" AND up.user_id IN (?a)", $params['friend_ids']);
-    } else {
-        //自分の投稿のみ
-        /** @noinspection PhpUndefinedFunctionInspection */
-        $condition .= db_quote(" AND up.user_id = ?i", $auth['user_id']);
     }
 
     if ($params['status']) {

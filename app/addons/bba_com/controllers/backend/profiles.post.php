@@ -7,7 +7,9 @@
  * @var $auth
  */
 
+use Tygh\Tools\SecurityHelper;
 use Tygh\Registry;
+
 
 if (!defined('BOOTSTRAP')) {
     die('Access denied');
