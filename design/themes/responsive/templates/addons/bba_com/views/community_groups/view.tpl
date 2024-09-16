@@ -1,21 +1,36 @@
-{*<div class="row-fluid">*}
-{*    <div class="span16">*}
-{*        {include file="addons/bba_com/views/community/components/my_profile_top.tpl" cp_data=$cp_data}*}
-{*    </div>*}
-{*</div>*}
+<div class="row-fluid">
+    <div class="span16">
+
+        <div class="bba-community-header">
+
+            {*登録した画像 group_icon*}
+            {if $group_data.group_icon}
+                <div class="bba-community-image">
+                    {include file="common/image.tpl" images=$group_data.group_icon no_ids=true image_width=200 image_height=200 class="bba-community-group-image-icon"}
+                </div>
+            {/if}
+            <h2>{$group_data.group}</h2>
+
+        </div>
+    </div>
+</div>
 
 <div class="row-fluid">
-    <div class="span4">
-        {include file="addons/bba_com/views/community/components/home_side.tpl" cp_data=$cp_data}
+    <div class="span5">
+        {include file="addons/bba_com/views/community/components/group_side.tpl" group_data=$group_data}
     </div>
-    <div class="span9">
+    <div class="span11">
         <div class="bba-timeline">
+
+
             {* 書き込む *}
             <div class="bba-community-new-post">
                 <form action="{""|fn_url}" method="post" class="posts-form" name="post_new" id="post_new">
                     <input type="hidden" name="redirect_url" value="{$config.current_url}"/>
-                    {* T：タイムラインに投稿する*}
-                    <input type="hidden" name="new_post[post_type]" value="T"/>
+                    {* G：グループに投稿する*}
+                    <input type="hidden" name="new_post[post_type]" value="G"/>
+                    {* グループID *}
+                    <input type="hidden" name="new_post[object_id]" value="{$group_data.group_id}"/>
 
                     <div class="bba-community-new-post-header">
                         <div class="bba-community-new-post-user-icon">
@@ -33,16 +48,17 @@
 
                             <textarea id="new_post_article" name="new_post[article]"
                                       cols="20" rows="8" class="ty-input-text-large"
-                                      placeholder="{__("bba_com.community_post_article_ph")}"></textarea>
+                                      placeholder="{__("bba_com.group_post_article_ph")}"></textarea>
                         </div>
                     </div>
                     <div class="bba-community-new-post-footer">
                         <div class="buttons-container">
-                            {include file="buttons/button.tpl" but_text=__("bba_com.community_post_new") but_meta="ty-btn__secondary bba-community-new-post-btn" but_role="submit" but_name="dispatch[community.add_new_post]"}
+                            {include file="buttons/button.tpl" but_text=__("bba_com.community_post_new") but_meta="ty-btn__secondary bba-community-new-post-btn" but_role="submit" but_name="dispatch[community_groups.add_new_post]"}
                         </div>
                     </div>
                 </form>
             </div>
+
 
             {* タイムライン*}
             <div class="bba-community-posts">
@@ -53,7 +69,7 @@
                     {assign var="post_user_icon_size" value=60}
                     {foreach from=$user_posts item=up}
                         {*コンテンツ*}
-                        {include file="addons/bba_com/views/community/components/user_post_content.tpl" cp_data=$cp_data post_data=$up post_user_icon_size=$post_user_icon_size}
+                        {include file="addons/bba_com/views/community/components/user_post_content.tpl" group_data=$group_data post_data=$up post_user_icon_size=$post_user_icon_size}
                     {/foreach}
 
                 {else}
@@ -65,9 +81,6 @@
 
             </div>
         </div>
-    </div>
-    <div class="span3">
-        {include file="addons/bba_com/views/community/components/general_side.tpl"}
     </div>
 </div>
 
@@ -87,7 +100,7 @@
             }
         });
 
-        //.bba-community-post-comment-btnがクリックされたらdata-post-idを取得して、コメント欄をtoggleする
+        //.bba-community-post-comment-btnがクリックされたらdata-post-idを取得して、アラートとして表示する
         $(document).on('click', '.bba-community-post-comment-btn', function () {
             const postId = $(this).data('post-id');
             $("#comment_to_" + postId).toggle();
@@ -95,4 +108,4 @@
     })(Tygh, Tygh.$);
 </script>
 
-{capture name="mainbox_title"}{__("bba_com.community_home")}{/capture}
+{*{capture name="mainbox_title"}{__("bba_com.community_my_profile")}{/capture}*}

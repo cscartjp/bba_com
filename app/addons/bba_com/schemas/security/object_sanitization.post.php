@@ -82,4 +82,19 @@ $schema['community_user_posts'] = [
     ]
 ];
 
+//グループの作成 community_groups
+//`group_id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT,
+//`create_user_id` mediumint(8) UNSIGNED NOT NULL,
+//`group` varchar(128) NOT NULL DEFAULT '',
+//`description` text NOT NULL DEFAULT '',
+//`type` char(1) NOT NULL DEFAULT 'P',
+//`timestamp` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
+//`status` char(1) NOT NULL DEFAULT 'A',
+$schema['community_groups'] = [
+    SecurityHelper::SCHEMA_SECTION_FIELD_RULES => [
+        'group' => SecurityHelper::ACTION_REMOVE_HTML,
+        'description' => SecurityHelper::ACTION_REMOVE_HTML
+    ]
+];
+
 return $schema;

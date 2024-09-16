@@ -15,7 +15,7 @@
 
         {*グループ*}
         <li>
-            <a href="{"community.groups"|fn_url}">{__("bba_com.community_groups")}</a>
+            <a href="{"community_groups.list"|fn_url}">{__("bba_com.community_groups")}</a>
         </li>
     </ul>
 </div>

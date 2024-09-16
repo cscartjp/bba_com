@@ -26,8 +26,6 @@
                             <h4>{$cp_data.name}</h4>
                         </div>
                     </div>
-
-
                     <div class="bba-community-new-post-body">
                         <div class="ty-control-group">
                             <label for="new_post_article"

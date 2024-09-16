@@ -23,7 +23,7 @@
         </div>
     </div>
     <div class="bba-community-post-body">
-
+        {*lazyloadをscripts.post.tplで読み込む必要がある*}
         {if $post_data.ogp_info.image}
             <div class="bba-community-post-ogp-info">
                 <a href="{$post_data.ogp_info.link}" target="_blank">
@@ -31,8 +31,10 @@
                         <img class="lazyload" data-src="{$post_data.ogp_info.image}"
                              src="/images/no_image.png" alt="{$post_data.ogp_info.title}"/>
                     </div>
-                    <p class="bba-community-ogp-title">{$post_data.ogp_info.title}</p>
-                    <p class="bba-community-ogp-description">{$post_data.ogp_info.description}</p>
+                    <div class="bba-community-ogp-details">
+                        <p class="bba-community-ogp-title">{$post_data.ogp_info.title}</p>
+                        <p class="bba-community-ogp-description">{$post_data.ogp_info.description}</p>
+                    </div>
                 </a>
             </div>
         {/if}
