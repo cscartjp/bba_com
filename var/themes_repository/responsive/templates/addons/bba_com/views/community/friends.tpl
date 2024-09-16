@@ -28,8 +28,7 @@
 
     </div>
     <div class="span3">
-        <h4>SIDE</h4>
-        運営からのお知らせなどを表示する
+        {include file="addons/bba_com/views/community/components/general_side.tpl"}
     </div>
 </div>
 

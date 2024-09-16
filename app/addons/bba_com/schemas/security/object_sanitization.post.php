@@ -77,6 +77,7 @@ $schema['community_profile'] = [
 //コミュニティへの投稿//community_user_posts
 $schema['community_user_posts'] = [
     SecurityHelper::SCHEMA_SECTION_FIELD_RULES => [
+        'cq' => SecurityHelper::ACTION_REMOVE_HTML,
         'article' => SecurityHelper::ACTION_SANITIZE_HTML
     ]
 ];
