@@ -455,19 +455,16 @@ function fn_bbcmm_is_user_in_group(int $group_id, int $user_id)
     /** @noinspection PhpUndefinedFunctionInspection */
     $group_type = db_get_field("SELECT type FROM ?:community_groups WHERE group_id = ?i", $group_id);
 
-
     /** @noinspection PhpUndefinedFunctionInspection */
     $condition = db_quote(" AND group_id = ?i", $group_id);
     /** @noinspection PhpUndefinedFunctionInspection */
     $condition .= db_quote(" AND user_id = ?i", $user_id);
-
 
     //グループのタイプが「I: 招待制」ではない場合
     if ($group_type !== 'I') {
         /** @noinspection PhpUndefinedFunctionInspection */
         $condition .= db_quote(" AND status = ?s", 'A');
     }
-
 
     /** @noinspection PhpUndefinedFunctionInspection */
     $group_data = db_get_row("SELECT role, status FROM ?:community_group_members WHERE 1 $condition", $group_id, $user_id);
@@ -484,6 +481,56 @@ function fn_bbcmm_is_user_in_group(int $group_id, int $user_id)
     }
 
     return $role;
+}
+
+//グループのメンバーデータを取得
+function fn_bbcmm_get_group_members(array $params = [], int $items_per_page = 0): array
+{
+    $group_id = $params['group_id'];
+    //$group_idがない場合は、空の配列を返す
+    if (!$group_id) {
+        return [[], $params];
+    }
+
+    $default_params = [
+        'items_per_page' => $items_per_page,
+    ];
+
+    $params = array_merge($default_params, $params);
+
+    $fields = [
+        'cgm.*',
+        'cp.name',
+        'cp.company_name',
+    ];
+
+    /** @noinspection PhpUndefinedFunctionInspection */
+    $join = db_quote(" LEFT JOIN ?:community_profiles AS cp ON cgm.user_id = cp.user_id");
+
+    /** @noinspection PhpUndefinedFunctionInspection */
+    $condition = db_quote("cgm.group_id = ?i", $group_id);
+
+    $limit = '';
+    if ($params['items_per_page'] > 0) {
+        /** @noinspection PhpUndefinedFunctionInspection */
+        $limit = db_quote("LIMIT 0, ?i", $params['items_per_page']);
+    }
+
+    $fields = implode(',', $fields);
+
+    /** @noinspection PhpUndefinedFunctionInspection */
+    $group_members = db_get_array("SELECT ?p FROM ?:community_group_members AS cgm ?p WHERE ?p ?p", $fields, $join, $condition, $limit);
+
+    //グループメンバーのアイコン取得
+    $group_member_images = [];
+    foreach ($group_members as &$group_member) {
+        //user_idからアイコン画像を取得する
+        /** @noinspection PhpUndefinedFunctionInspection */
+        $group_member_images[$group_member['user_id']] = fn_get_image_pairs($group_member['user_id'], 'community_profile', 'M', true, true, CART_LANGUAGE);
+        $group_member['profile_image'] = $group_member_images[$group_member['user_id']];
+    }
+
+    return [$group_members, $params];
 }
 
 

@@ -517,6 +517,12 @@
 
 .bba-com-group {
   margin-top: 0;
+
+  //inputにreadonlyがついた時のスタイル
+  input[readonly] {
+    background-color: #f9f9f9;
+  }
+
 }
 
 .bba-com-profile,
@@ -552,6 +558,42 @@
   }
 }
 
+.bba-community-members {
+  .bba-community-member {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    margin-bottom: 20px;
+    border-bottom: 1px solid #ddd;
+
+    .bba-community-role {
+      .alert {
+        display: inline-block;
+        min-width: 100px;
+        font-size: 0.8em;
+        text-align: center;
+      }
+    }
+
+    .bba-community-member-profile {
+      flex-grow: 1;
+
+      h4, h4 a {
+        font-size: 1em;
+        font-weight: bold;
+        margin: 0;
+        padding: 0;
+      }
+
+      p {
+        font-size: 0.8em;
+        margin: 0;
+        padding: 0;
+      }
+    }
+  }
+}
+
 .bba-community-friends {
   .bba-community-friend {
     margin-bottom: 20px;
@@ -560,7 +602,15 @@
 
     a {
       display: flex;
+      gap: 10px;
       align-items: center;
+
+      .alert {
+        display: inline-block;
+        min-width: 100px;
+        font-size: 0.8em;
+        text-align: center;
+      }
     }
 
     .bba-community-friend-image-photo {
@@ -717,11 +767,73 @@
   gap: 10px;
   //中央寄せ
   justify-content: center;
+  margin-bottom: 20px;
+
+  .bba-group-details {
+    h2 {
+      font-size: 1.5em;
+      line-height: 1.5em;
+      font-weight: bold;
+      margin: 0;
+    }
+
+    p {
+      font-size: 0.8em;
+      margin: 0;
+    }
+  }
 }
 
 .bba-group-side-left {
+
+  .bba-profile-image {
+    .bba-group-image-photo {
+      display: block;
+      width: 200px;
+      margin: 0 auto;
+    }
+  }
+
+  .bba-group-name {
+    text-align: center;
+    font-size: 1.1em;
+    font-weight: bold;
+    //margin: 20px 0;
+    margin-bottom: 0;
+    background-color: inherit;
+  }
+
+  .group-manage {
+    a {
+      display: block;
+      margin: 0 0 5px 20px;
+      font-size: 0.8em;
+    }
+  }
+
+
   .bba-group-description {
     font-size: 0.8em;
+  }
+
+  .group-member-list {
+    margin: 20px 0;
+  }
+
+  li {
+    margin-bottom: 10px;
+    border-bottom: 1px solid #ddd;
+
+    h4 {
+      font-size: 1.1em;
+      background-color: #f9f9f9;
+      padding: 10px;
+    }
+
+    a {
+      display: block;
+      font-size: 1em;
+    }
   }
 }
 

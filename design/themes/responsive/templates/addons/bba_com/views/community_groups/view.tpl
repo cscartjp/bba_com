@@ -2,23 +2,14 @@
     <div class="span16">
 
         <div class="bba-community-header">
-
-            {*登録した画像 group_icon*}
-            {if $group_data.group_icon}
-                <div class="bba-community-image">
-                    {include file="common/image.tpl" images=$group_data.group_icon no_ids=true image_width=200 image_height=200 class="bba-community-group-image-icon"}
-                </div>
-            {/if}
-            <h2>{$group_data.group}</h2>
-
-
+            {include file="addons/bba_com/views/community_groups/components/group_header.tpl" group_data=$group_data is_member=$is_member}
         </div>
     </div>
 </div>
 
 <div class="row-fluid">
     <div class="span5">
-        {include file="addons/bba_com/views/community/components/group_side.tpl" group_data=$group_data}
+        {include file="addons/bba_com/views/community_groups/components/group_side.tpl" cp_data=$cp_data}
     </div>
     <div class="span11">
         <div class="bba-timeline">

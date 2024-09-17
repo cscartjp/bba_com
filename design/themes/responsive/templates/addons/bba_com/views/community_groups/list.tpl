@@ -8,10 +8,11 @@
     </div>
 </div>
 <div class="row-fluid">
-    <div class="span4">
-        {include file="addons/bba_com/views/community/components/home_side.tpl" cp_data=$cp_data}
-    </div>
-    <div class="span9">
+    {*    <div class="span4">*}
+    {*        *}{*        {include file="addons/bba_com/views/community_groups/components/group_side.tpl" cp_data=$cp_data}*}
+    {*        {include file="addons/bba_com/views/community/components/home_side.tpl" cp_data=$cp_data}*}
+    {*    </div>*}
+    <div class="span13">
         {*グループのリスト $groups*}
         {if $groups}
             {assign var="group_image_size" value=130}
