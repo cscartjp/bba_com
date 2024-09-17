@@ -64,6 +64,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             ];
             fn_bbcmm_attach_image_pairs($group_id, $object_types);
 
+            //メンバーに追加
+            $member_data = [
+                'group_id' => $group_id,
+                'user_id' => $user_id,
+                'role' => 'A',
+                'timestamp' => date('Y-m-d H:i:s'),
+            ];
+            /** @noinspection PhpUndefinedFunctionInspection */
+            $group_member_id = db_query("INSERT INTO ?:community_group_members ?e", $member_data);
+
 
             /** @noinspection PhpUndefinedFunctionInspection */
             fn_set_notification('N', __('notice'), __('bba_com.group_created'));
@@ -74,6 +84,78 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         /** @noinspection PhpUndefinedConstantInspection */
         return [CONTROLLER_STATUS_OK, 'community_groups.list'];
+    }
+
+    //join
+    if ($mode === 'join') {
+
+        //ログインしていない場合はログインページへ
+        if (empty($auth['user_id'])) {
+            /** @noinspection PhpUndefinedConstantInspection */
+            return array(CONTROLLER_STATUS_REDIRECT, 'auth.login_form?return_url=' . urlencode(Registry::get('config.current_url')));
+        }
+
+        $group_id = $_REQUEST['group_id'];
+        $user_id = $auth['user_id'];
+
+        //$group_idが数字でない場合は404
+        if (!is_numeric($group_id)) {
+            /** @noinspection PhpUndefinedConstantInspection */
+            return [CONTROLLER_STATUS_NO_PAGE];
+        }
+
+        //リダイレクト先
+        $redirect_url = $_REQUEST['redirect_url'] ?? 'community_groups.list';
+
+        //ユーザーがグループに参加しているか確認
+        $is_member = fn_bbcmm_is_user_in_group($group_id, $user_id);
+        //すでにメンバーの場合はリダイレクト
+        if ($is_member) {
+            /** @noinspection PhpUndefinedFunctionInspection */
+            fn_set_notification('E', __('error'), __('bba_com.already_joined_group'));
+
+            /** @noinspection PhpUndefinedConstantInspection */
+            return [CONTROLLER_STATUS_REDIRECT, $redirect_url];
+        }
+
+        //グループデータを取得
+        $group_data = fn_bbcmm_get_group_data($group_id);
+        $group_type = $group_data['type'];
+
+
+        //データベースに保存
+        $member_data = [
+            'group_id' => $group_id,
+            'user_id' => $user_id,
+            'role' => 'M',//M: member
+            'timestamp' => date('Y-m-d H:i:s'),
+        ];
+
+        //グループのタイプがIの場合は承認待ち
+        if ($group_type === 'I') {
+            $member_data['status'] = 'P';//P: pending
+        }
+
+        /** @noinspection PhpUndefinedFunctionInspection */
+        $group_member_id = db_query("INSERT INTO ?:community_group_members ?e", $member_data);
+
+        if ($group_member_id) {
+
+            if ($group_type === 'I') {
+                /** @noinspection PhpUndefinedFunctionInspection */
+                fn_set_notification('N', __('notice'), __('bba_com.group_join_request'));
+            } else {
+                /** @noinspection PhpUndefinedFunctionInspection */
+                fn_set_notification('N', __('notice'), __('bba_com.group_joined'));
+            }
+        } else {
+            /** @noinspection PhpUndefinedFunctionInspection */
+            fn_set_notification('E', __('error'), __('bba_com.group_not_joined'));
+        }
+
+
+        /** @noinspection PhpUndefinedConstantInspection */
+        return [CONTROLLER_STATUS_OK, $redirect_url];
     }
 
 
@@ -191,6 +273,55 @@ if ($mode === 'list') {
     fn_add_breadcrumb(__('bba_com.community_groups'));
 }
 
+//view
+if ($mode === 'view') {
+
+    $group_id = $_REQUEST['group_id'];
+
+    //ログインしていない場合はログインページへ
+    if (empty($auth['user_id'])) {
+        /** @noinspection PhpUndefinedConstantInspection */
+        return array(CONTROLLER_STATUS_REDIRECT, 'auth.login_form?return_url=' . urlencode(Registry::get('config.current_url')));
+    }
+
+    $params = $_REQUEST;
+
+    //自分のデータを取得////////////////////////////////////////////////////
+    $cp_data = fn_bbcmm_get_my_community_info();
+    Tygh::$app['view']->assign('cp_data', $cp_data);
+    ////////////////////////////////////////////////////////////////////////
+
+    //ユーザーがグループに参加しているか確認
+    $is_member = fn_bbcmm_is_user_in_group($group_id, $auth['user_id']);
+    Tygh::$app['view']->assign('is_member', $is_member);
+
+    
+    //グループデータを取得
+    $group_data = fn_bbcmm_get_group_data($group_id);
+
+    //TODO typeがIの場合はメンバーかどうかを確認する
+    Tygh::$app['view']->assign('group_data', $group_data);
+
+    //グループの投稿データを取得
+    $params['post_type'] = 'G';//G: グループの投稿
+    $params['disp_like'] = true;//いいねボタン
+    [$user_posts, $search] = fn_bbcmm_get_user_posts($params, Registry::get('settings.Appearance.elements_per_page'));
+
+
+    Tygh::$app['view']->assign('user_posts', $user_posts);
+    Tygh::$app['view']->assign('search', $search);
+
+    //パンくずリストを追加
+    /** @noinspection PhpUndefinedFunctionInspection */
+    fn_add_breadcrumb(__('bba_com.community_home'), 'community.home');
+    //bba_com.community_groups
+    /** @noinspection PhpUndefinedFunctionInspection */
+    fn_add_breadcrumb(__('bba_com.community_groups'), 'community_groups.list');
+    //bba_com.view_group
+    /** @noinspection PhpUndefinedFunctionInspection */
+    fn_add_breadcrumb($group_data['group']);
+}
+
 
 //create
 if ($mode === 'create') {
@@ -216,49 +347,4 @@ if ($mode === 'create') {
     fn_add_breadcrumb(__('bba_com.community_groups'), 'community_groups.list');
     /** @noinspection PhpUndefinedFunctionInspection */
     fn_add_breadcrumb(__('bba_com.create_group'));
-}
-
-//view
-if ($mode === 'view') {
-
-    $group_id = $_REQUEST['group_id'];
-
-    //ログインしていない場合はログインページへ
-    if (empty($auth['user_id'])) {
-        /** @noinspection PhpUndefinedConstantInspection */
-        return array(CONTROLLER_STATUS_REDIRECT, 'auth.login_form?return_url=' . urlencode(Registry::get('config.current_url')));
-    }
-
-    $params = $_REQUEST;
-
-    //自分のデータを取得////////////////////////////////////////////////////
-    $cp_data = fn_bbcmm_get_my_community_info();
-    Tygh::$app['view']->assign('cp_data', $cp_data);
-    ////////////////////////////////////////////////////////////////////////
-
-
-    //グループデータを取得
-    $group_data = fn_bbcmm_get_group_data($group_id);
-
-    //TODO typeがIの場合はメンバーかどうかを確認する
-    Tygh::$app['view']->assign('group_data', $group_data);
-
-    //グループの投稿データを取得
-    $params['post_type'] = 'G';//G: グループの投稿
-    $params['disp_like'] = true;//いいねボタン
-    [$user_posts, $search] = fn_bbcmm_get_user_posts($params, Registry::get('settings.Appearance.elements_per_page'));
-    
-
-    Tygh::$app['view']->assign('user_posts', $user_posts);
-    Tygh::$app['view']->assign('search', $search);
-
-    //パンくずリストを追加
-    /** @noinspection PhpUndefinedFunctionInspection */
-    fn_add_breadcrumb(__('bba_com.community_home'), 'community.home');
-    //bba_com.community_groups
-    /** @noinspection PhpUndefinedFunctionInspection */
-    fn_add_breadcrumb(__('bba_com.community_groups'), 'community_groups.list');
-    //bba_com.view_group
-    /** @noinspection PhpUndefinedFunctionInspection */
-    fn_add_breadcrumb($group_data['group']);
 }

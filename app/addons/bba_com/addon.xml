@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <addon scheme="3.0">
     <id>bba_com</id>
-    <version>0.0.7</version>
+    <version>0.0.8</version>
     <priority>70000</priority>
     <position>0</position>
     <status>active</status>
@@ -133,6 +133,21 @@
         <!--            ) ENGINE=MyISAM DEFAULT CHARSET UTF8;-->
         <!--        </item>-->
         <!--        <item for="uninstall">DROP TABLE IF EXISTS ?:community_groups;</item>-->
+
+        <!--グループメンバー community_group_members-->
+        <!--        <item>DROP TABLE IF EXISTS ?:community_group_members;</item>-->
+        <!--        <item>-->
+        <!--            CREATE TABLE `?:community_group_members` (-->
+        <!--            `group_member_id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT,-->
+        <!--            `group_id` int(11) UNSIGNED NOT NULL,-->
+        <!--            `user_id` mediumint(8) UNSIGNED NOT NULL,-->
+        <!--            `role` char(1) NOT NULL DEFAULT 'M',-->
+        <!--            `timestamp` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',-->
+        <!--            `status` char(1) NOT NULL DEFAULT 'A',-->
+        <!--            PRIMARY KEY (`group_member_id`)-->
+        <!--            ) ENGINE=MyISAM DEFAULT CHARSET UTF8;-->
+        <!--        </item>-->
+        <!--        <item for="uninstall">DROP TABLE IF EXISTS ?:community_group_members;</item>-->
 
 
         <!--        <item for="install">-->

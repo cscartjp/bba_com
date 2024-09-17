@@ -372,3 +372,43 @@ msgstr "グループの作成に失敗しました"
 msgctxt "Languages::bba_com.group_post_article_ph"
 msgid "グループに投稿しよう！"
 msgstr "グループに投稿しよう！"
+
+msgctxt "Languages::bba_com.community_private_group"
+msgid "招待制のグループです。参加申請を行なってください。"
+msgstr "招待制のグループです。参加申請を行なってください。"
+
+msgctxt "Languages::bba_com.community_join_application"
+msgid "参加申請を行なう"
+msgstr "参加申請を行なう"
+
+msgctxt "Languages::bba_com.community_join"
+msgid "参加する"
+msgstr "参加する"
+
+msgctxt "Languages::bba_com.community_join_application_note"
+msgid "このグループに参加するためには、参加申請を行なってください。"
+msgstr "このグループに参加するためには、参加申請を行なってください。"
+
+msgctxt "Languages::bba_com.community_join_note"
+msgid "このグループに参加しますか？参加することで書き込みができるようになります。"
+msgstr "このグループに参加しますか？参加することで書き込みができるようになります。"
+
+msgctxt "Languages::bba_com.group_joined"
+msgid "グループに参加しました"
+msgstr "グループに参加しました"
+
+msgctxt "Languages::bba_com.group_join_request"
+msgid "グループ参加申請を行ないました"
+msgstr "グループ参加申請を行ないました"
+
+msgctxt "Languages::bba_com.group_not_joined"
+msgid "グループの参加に失敗しました"
+msgstr "グループの参加に失敗しました"
+
+msgctxt "Languages::bba_com.already_joined_group"
+msgid "既にグループに参加しています"
+msgstr "既にグループに参加しています"
+
+msgctxt "Languages::bba_com.community_join_pending"
+msgid "参加申請中です。しばらくお待ちください。"
+msgstr "参加申請中です。しばらくお待ちください。"

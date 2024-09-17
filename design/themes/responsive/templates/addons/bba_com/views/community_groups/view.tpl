@@ -11,6 +11,7 @@
             {/if}
             <h2>{$group_data.group}</h2>
 
+
         </div>
     </div>
 </div>
@@ -21,9 +22,32 @@
     </div>
     <div class="span11">
         <div class="bba-timeline">
+            {if !$is_member}
+                {if $group_data.type == "I"}
+                    {assign var="join_btn_text" value=__("bba_com.community_join_application")}
+                    {assign var="join_note" value=__("bba_com.community_join_application_note")}
+                {else}
+                    {assign var="join_btn_text" value=__("bba_com.community_join")}
+                    {assign var="join_note" value=__("bba_com.community_join_note")}
+                {/if}
 
+                {*メンバーではない場合、参加申請ボタンを表示する*}
+                <div class="bba-community-join">
+                    <form action="{""|fn_url}" method="post" class="bba-community-join-form">
+                        <input type="hidden" name="redirect_url" value="{$config.current_url}"/>
+                        <input type="hidden" name="group_id" value="{$group_data.group_id}"/>
+                        {include file="buttons/button.tpl" but_text=$join_btn_text but_meta="ty-btn__primary bba-community-join-btn cm-confirm" but_role="submit" but_name="dispatch[community_groups.join]"}
 
-            {* 書き込む *}
+                        <p class="text-center muted">{$join_note}</p>
+                    </form>
+                </div>
+            {elseif $is_member == "P"}
+                {* 参加申請中*}
+                <div class="bba-community-join">
+                    <p class="ty-no-items">{__("bba_com.community_join_pending")}</p>
+                </div>
+            {else}
+                {* 新規書き込み*}
             <div class="bba-community-new-post">
                 <form action="{""|fn_url}" method="post" class="posts-form" name="post_new" id="post_new">
                     <input type="hidden" name="redirect_url" value="{$config.current_url}"/>
@@ -58,28 +82,27 @@
                     </div>
                 </form>
             </div>
+            {/if}
 
 
-            {* タイムライン*}
-            <div class="bba-community-posts">
-
-                {include file="common/pagination.tpl"}
-
-                {if $user_posts}
-                    {assign var="post_user_icon_size" value=60}
-                    {foreach from=$user_posts item=up}
-                        {*コンテンツ*}
-                        {include file="addons/bba_com/views/community/components/user_post_content.tpl" group_data=$group_data post_data=$up post_user_icon_size=$post_user_icon_size}
-                    {/foreach}
-
-                {else}
-                    <p class="ty-no-items">{__("no_items")}</p>
-                {/if}
-
-                {*                {include file="common/pagination.tpl" extra_id=",vendors_map_container*" full_render=true }*}
-                {include file="common/pagination.tpl" full_render=true }
-
-            </div>
+            {if $group_data.type == "I" && (!$is_member || $is_member == "P")}
+                <p class="ty-no-items">{__("bba_com.community_private_group")}</p>
+            {else}
+                {* タイムライン*}
+                <div class="bba-community-posts">
+                    {include file="common/pagination.tpl"}
+                    {if $user_posts}
+                        {assign var="post_user_icon_size" value=60}
+                        {foreach from=$user_posts item=up}
+                            {*コンテンツ*}
+                            {include file="addons/bba_com/views/community/components/user_post_content.tpl" group_data=$group_data post_data=$up post_user_icon_size=$post_user_icon_size}
+                        {/foreach}
+                    {else}
+                        <p class="ty-no-items">{__("no_items")}</p>
+                    {/if}
+                    {include file="common/pagination.tpl" full_render=true }
+                </div>
+            {/if}
         </div>
     </div>
 </div>
