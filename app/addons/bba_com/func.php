@@ -394,7 +394,7 @@ function fn_bbcmm_get_groups($params = [], int $items_per_page = 0): array
     ];
 
     /** @noinspection PhpUndefinedFunctionInspection */
-    $sorting = db_sort($params, $sortings, 'sort_group_id', 'asc');
+    $sorting = db_sort($params, $sortings, 'sort_group_id', 'desc');
 
     $fields = implode(',', $fields);
 
@@ -446,6 +446,44 @@ function fn_bbcmm_get_group_data(int $group_id): array
     fn_bbcmm_get_image_pairs($group_id, ['group_icon'], $group_data);
 
     return $group_data;
+}
+
+//ユーザーがグループに参加しているかどうかを取得する
+function fn_bbcmm_is_user_in_group(int $group_id, int $user_id)
+{
+    //グループのタイプ
+    /** @noinspection PhpUndefinedFunctionInspection */
+    $group_type = db_get_field("SELECT type FROM ?:community_groups WHERE group_id = ?i", $group_id);
+
+
+    /** @noinspection PhpUndefinedFunctionInspection */
+    $condition = db_quote(" AND group_id = ?i", $group_id);
+    /** @noinspection PhpUndefinedFunctionInspection */
+    $condition .= db_quote(" AND user_id = ?i", $user_id);
+
+
+    //グループのタイプが「I: 招待制」ではない場合
+    if ($group_type !== 'I') {
+        /** @noinspection PhpUndefinedFunctionInspection */
+        $condition .= db_quote(" AND status = ?s", 'A');
+    }
+
+
+    /** @noinspection PhpUndefinedFunctionInspection */
+    $group_data = db_get_row("SELECT role, status FROM ?:community_group_members WHERE 1 $condition", $group_id, $user_id);
+    $role = $group_data['role'];
+    $status = $group_data['status'];
+
+    if (!$role) {
+        return false;
+    }
+
+    //グループのタイプが「I: 招待制」の場合
+    if ($group_type === 'I' && $status === 'P') {
+        return 'P';
+    }
+
+    return $role;
 }
 
 
