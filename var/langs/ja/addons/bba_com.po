@@ -412,3 +412,76 @@ msgstr "既にグループに参加しています"
 msgctxt "Languages::bba_com.community_join_pending"
 msgid "参加申請中です。しばらくお待ちください。"
 msgstr "参加申請中です。しばらくお待ちください。"
+
+msgctxt "Languages::bba_com.group_control"
+msgid "グループ管理"
+msgstr "グループ管理"
+
+msgctxt "Languages::bba_com.group_edit"
+msgid "グループ編集"
+msgstr "グループ編集"
+
+msgctxt "Languages::bba_com.group_members_manage"
+msgid "グループメンバー管理"
+msgstr "グループメンバー管理"
+
+msgctxt "Languages::bba_com.group_members"
+msgid "グループメンバー"
+msgstr "グループメンバー"
+
+msgctxt "Languages::bba_com.update_group"
+msgid "グループを更新"
+msgstr "グループを更新"
+
+msgctxt "Languages::bba_com.group_name_hint"
+msgid "グループ名は変更できません。管理者にお問い合わせください。"
+msgstr "グループ名は変更できません。管理者にお問い合わせください。"
+
+msgctxt "Languages::bba_com.group_updated"
+msgid "グループを更新しました"
+msgstr "グループを更新しました"
+
+msgctxt "Languages::bba_com.group_admin"
+msgid "管理者"
+msgstr "管理者"
+
+msgctxt "Languages::bba_com.member_type_a"
+msgid "管理者"
+msgstr "管理者"
+
+msgctxt "Languages::bba_com.member_type_m"
+msgid "メンバー"
+msgstr "メンバー"
+
+msgctxt "Languages::bba_com.member_type_g"
+msgid "ゲスト"
+msgstr "ゲスト"
+
+
+msgctxt "Languages::bba_com.group_member"
+msgid "メンバー"
+msgstr "メンバー"
+
+msgctxt "Languages::bba_com.group_member_status_disapprove"
+msgid "無効化"
+msgstr "無効化"
+
+msgctxt "Languages::bba_com.group_member_status_accept"
+msgid "承認"
+msgstr "承認"
+
+msgctxt "Languages::bba_com.group_member_status_reject"
+msgid "拒否"
+msgstr "拒否"
+
+msgctxt "Languages::bba_com.group_member_status_active"
+msgid "有効化"
+msgstr "有効化"
+
+msgctxt "Languages::bba_com.group_status_changed"
+msgid "グループメンバーのステータスを変更しました"
+msgstr "グループメンバーのステータスを変更しました"
+
+msgctxt "Languages::bba_com.community_all_members"
+msgid "全てのメンバー"
+msgstr "全てのメンバー"

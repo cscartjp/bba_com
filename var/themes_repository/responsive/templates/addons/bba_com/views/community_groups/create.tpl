@@ -9,9 +9,9 @@
 
             {*グループ名*}
             <div class="ty-control-group">
-                <label for="name_kana"
+                <label for="group_name"
                        class="ty-control-group__title cm-required cm-trim">{__("bba_com.group_name")}</label>
-                <input type="text" id="name_kana" name="group_data[group]" size="32" maxlength="128"
+                <input type="text" id="group_name" name="group_data[group]" size="32" maxlength="128"
                        value="{$group_data.group}"
                        class="ty-input-text"/>
             </div>
