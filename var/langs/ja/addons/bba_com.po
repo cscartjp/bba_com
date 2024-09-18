@@ -485,3 +485,32 @@ msgstr "グループメンバーのステータスを変更しました"
 msgctxt "Languages::bba_com.community_all_members"
 msgid "全てのメンバー"
 msgstr "全てのメンバー"
+
+msgctxt "Languages::bba_com.just_now"
+msgid "たった今"
+msgstr "たった今"
+
+msgctxt "Languages::bba_com.minutes_ago"
+msgid "[diff]分前"
+msgstr "[diff]分前"
+
+msgctxt "Languages::bba_com.hours_ago"
+msgid "[diff]時間前"
+msgstr "[diff]時間前"
+
+msgctxt "Languages::bba_com.days_ago"
+msgid "[diff]日前"
+msgstr "[diff]日前"
+
+msgctxt "Languages::bba_com.weeks_ago"
+msgid "[diff]週間前"
+msgstr "[diff]週間前"
+
+msgctxt "Languages::bba_com.months_ago"
+msgid "[diff]ヶ月前"
+msgstr "[diff]ヶ月前"
+
+msgctxt "Languages::bba_com.years_ago"
+msgid "[diff]年前"
+msgstr "[diff]年前"
+

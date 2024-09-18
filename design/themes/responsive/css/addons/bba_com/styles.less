@@ -305,8 +305,10 @@
         }
 
         p {
+          padding-top: 10px;
           font-size: 0.7em;
           line-height: 0.7em;
+          color: #999;
         }
       }
     }
@@ -367,10 +369,14 @@
       }
 
 
+      .bba-community-post-article {
+        padding: 10px 0;
+      }
+
       .bba-community-post-article,
       .bba-community-post-article a {
         font-size: 14px;
-        line-height: 2em;
+        line-height: 1.6em;
         letter-spacing: 0.2em;
         word-break: break-all;
       }
@@ -392,15 +398,34 @@
         .bba-community-post-footer-comment {
           padding-left: 10px;
 
-          .bba-community-post-like-btn:hover,
-          .bba-community-post-comment-btn:hover {
+          .bba-community-post-like-btn,
+          .bba-community-post-comment-btn {
+            display: flex;
+            align-items: center;
+            gap: 3px;
+            font-size: 0.7em;
             text-decoration: none;
           }
 
-          span {
-            margin-left: 5px;
-            font-size: 0.8em;
+
+          .bba-community-post-like-btn:hover,
+          .bba-community-post-comment-btn:hover {
+            //text-decoration: none;
           }
+
+          //i {
+          //  display: inline-block;
+          //  font-size: 1.5em;
+          //}
+          //
+          //span {
+          //  display: inline-block;
+          //  //margin-left: 5px;
+          //  font-size: 0.8em;
+          //  line-height: 1em;
+          //}
+
+
         }
       }
 
@@ -454,9 +479,11 @@
             }
 
             .bba-community-post-comment-timestamp {
+              padding-top: 5px;
               font-size: 0.7em;
-              line-height: 1em;
+              line-height: 1.1em;
               color: #999;
+              text-align: right;
             }
           }
         }

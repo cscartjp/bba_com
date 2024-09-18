@@ -649,3 +649,44 @@ function fn_bbcmm_get_hashed_time(): string
 {
     return md5(date('Y-m-d H:i:00'));
 }
+
+//引数（日付）をフォーマットする SNSのようにX時間前、X日前、X週間前、Xヶ月前、X年前のような形式にする
+/** @noinspection PhpUndefinedFunctionInspection */
+function fn_bbcmm_format_date($date): string
+{
+    $date = strtotime($date);
+    $now = time();
+    $diff = $now - $date;
+
+    if ($diff < 60) {
+        return __('bba_com.just_now');
+    }
+
+    $diff = floor($diff / 60);
+    if ($diff < 60) {
+        return __('bba_com.minutes_ago', ['[diff]' => $diff]);
+    }
+
+    $diff = floor($diff / 60);
+    if ($diff < 24) {
+        return __('bba_com.hours_ago', ['[diff]' => $diff]);
+    }
+
+    $diff = floor($diff / 24);
+    if ($diff < 7) {
+        return __('bba_com.days_ago', ['[diff]' => $diff]);
+    }
+
+    $diff = floor($diff / 7);
+    if ($diff < 4) {
+        return __('bba_com.weeks_ago', ['[diff]' => $diff]);
+    }
+
+    $diff = floor($diff / 4);
+    if ($diff < 12) {
+        return __('bba_com.months_ago', ['[diff]' => $diff]);
+    }
+
+    $diff = floor($diff / 12);
+    return __('bba_com.years_ago', ['[diff]' => $diff]);
+}
