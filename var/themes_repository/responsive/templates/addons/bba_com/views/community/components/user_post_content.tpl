@@ -19,7 +19,7 @@
                     {$post_data.poster_name}
                     {if $not_my_post == "Y"}</a>{/if}
             </h4>
-            <p>{$post_data.timestamp}</p>
+            <p>{$post_data.timestamp|fn_bbcmm_format_date}</p>
         </div>
     </div>
     <div class="bba-community-post-body">
@@ -60,7 +60,7 @@
                 <a href="javascript:void(0);" class="bba-community-post-comment-btn"
                    data-post-id="{$post_data.post_id}">
                     <i class="ty-icon-bubble"></i>
-                    <span>{$post_data.comment_count}</span>
+                    {if $post_data.comment_count}<span>{$post_data.comment_count}</span>{/if}
                     <span>{__("bba_com.comment_the_post")}</span>
                 </a>
             </div>
@@ -100,7 +100,7 @@
                             </div>
 
                             <div class="bba-community-post-comment-timestamp">
-                                {$comment.timestamp}
+                                {$comment.timestamp|fn_bbcmm_format_date}
                             </div>
                         </div>
                     </div>
