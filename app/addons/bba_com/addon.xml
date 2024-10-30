@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <addon scheme="3.0">
     <id>bba_com</id>
-    <version>0.0.8</version>
+    <version>0.1.0</version>
     <priority>70000</priority>
     <position>0</position>
     <status>active</status>
@@ -149,6 +149,23 @@
         <!--        </item>-->
         <!--        <item for="uninstall">DROP TABLE IF EXISTS ?:community_group_members;</item>-->
 
+
+        <!--DM(Direct Mail) community_direct_mails-->
+        <!--        <item>DROP TABLE IF EXISTS ?:community_direct_mails;</item>-->
+        <!--        <item>-->
+        <!--            CREATE TABLE `?:community_direct_mails` (-->
+        <!--            `direct_mail_id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT,-->
+        <!--            `from_user_id` mediumint(8) UNSIGNED NOT NULL,-->
+        <!--            `to_user_id` mediumint(8) UNSIGNED NOT NULL,-->
+        <!--            `parent_id` int(11) UNSIGNED NOT NULL DEFAULT '0',-->
+        <!--            `subject` varchar(128) NOT NULL DEFAULT '',-->
+        <!--            `message` text NOT NULL DEFAULT '',-->
+        <!--            `timestamp` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',-->
+        <!--            `status` char(1) NOT NULL DEFAULT 'A',-->
+        <!--            PRIMARY KEY (`direct_mail_id`)-->
+        <!--            ) ENGINE=MyISAM DEFAULT CHARSET UTF8;-->
+        <!--        </item>-->
+        <!--        <item for="uninstall">DROP TABLE IF EXISTS ?:community_direct_mails;</item>-->
 
         <!--        <item for="install">-->
         <!--            ALTER TABLE ?:orders-->
