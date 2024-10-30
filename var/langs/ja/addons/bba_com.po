@@ -514,3 +514,30 @@ msgctxt "Languages::bba_com.years_ago"
 msgid "[diff]年前"
 msgstr "[diff]年前"
 
+msgctxt "Languages::bba_com.community_direct_mail_list"
+msgid "ダイレクトメール"
+msgstr "ダイレクトメール"
+
+msgctxt "Languages::bba_com.community_dm_subject"
+msgid "件名"
+msgstr "件名"
+
+msgctxt "Languages::bba_com.community_dm_message"
+msgid "メッセージ"
+msgstr "メッセージ"
+
+msgctxt "Languages::bba_com.community_dm_to_user_name"
+msgid "宛先"
+msgstr "宛先"
+
+msgctxt "Languages::bba_com.direct_mail_sent"
+msgid "ダイレクトメールを送信しました"
+msgstr "ダイレクトメールを送信しました"
+
+msgctxt "Languages::bba_com.view_dm_title"
+msgid "件名"
+msgstr "件名"
+
+msgctxt "Languages::bba_com.community_res_message_ph"
+msgid "返信メッセージを入力"
+msgstr "返信メッセージを入力"

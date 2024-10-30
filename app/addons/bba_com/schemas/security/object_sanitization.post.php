@@ -12,6 +12,7 @@
  * "copyright.txt" FILE PROVIDED WITH THIS DISTRIBUTION PACKAGE.            *
  ****************************************************************************/
 
+/** @noinspection PhpUndefinedClassInspection */
 use Tygh\Tools\SecurityHelper;
 
 
@@ -43,6 +44,7 @@ use Tygh\Tools\SecurityHelper;
 //`status` char(1) NOT NULL DEFAULT 'A',
 
 //プロフィールデータのサニタイズ
+/** @noinspection PhpUndefinedClassInspection */
 $schema['community_profile'] = [
     SecurityHelper::SCHEMA_SECTION_FIELD_RULES => [
         'name' => SecurityHelper::ACTION_REMOVE_HTML,
@@ -75,6 +77,7 @@ $schema['community_profile'] = [
 ];
 
 //コミュニティへの投稿//community_user_posts
+/** @noinspection PhpUndefinedClassInspection */
 $schema['community_user_posts'] = [
     SecurityHelper::SCHEMA_SECTION_FIELD_RULES => [
         'cq' => SecurityHelper::ACTION_REMOVE_HTML,
@@ -90,10 +93,21 @@ $schema['community_user_posts'] = [
 //`type` char(1) NOT NULL DEFAULT 'P',
 //`timestamp` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
 //`status` char(1) NOT NULL DEFAULT 'A',
+/** @noinspection PhpUndefinedClassInspection */
 $schema['community_groups'] = [
     SecurityHelper::SCHEMA_SECTION_FIELD_RULES => [
         'group' => SecurityHelper::ACTION_REMOVE_HTML,
         'description' => SecurityHelper::ACTION_REMOVE_HTML
+    ]
+];
+
+
+//DMのサニタイズ community_direct_mails
+/** @noinspection PhpUndefinedClassInspection */
+$schema['community_direct_mails'] = [
+    SecurityHelper::SCHEMA_SECTION_FIELD_RULES => [
+        'subject' => SecurityHelper::ACTION_REMOVE_HTML,
+        'message' => SecurityHelper::ACTION_REMOVE_HTML,
     ]
 ];
 

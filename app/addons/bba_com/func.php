@@ -534,6 +534,92 @@ function fn_bbcmm_get_group_members(array $params = [], int $items_per_page = 0)
 }
 
 
+//DMデータを取得 引数：$direct_mail_id
+function fn_bbcmm_get_direct_mail_data(int $direct_mail_id, $params = []): array
+{
+
+    //自分のユーザーID
+    $my_id = Tygh::$app['session']['auth']['user_id'];
+
+    /** @noinspection PhpUndefinedFunctionInspection */
+    $dm_data = db_get_row("SELECT * FROM ?:community_direct_mails WHERE direct_mail_id = ?i", $direct_mail_id);
+
+    //$my_idとfrom_user_idまたはto_user_idが一致しない場合は、404
+    if ($dm_data['from_user_id'] !== $my_id && $dm_data['to_user_id'] !== $my_id) {
+        /** @noinspection PhpUndefinedConstantInspection */
+        return [CONTROLLER_STATUS_NO_PAGE];
+    }
+
+
+    //相手のuser_id
+    $to_user_id = $dm_data['from_user_id'] === $my_id ? $dm_data['to_user_id'] : $dm_data['from_user_id'];
+
+    $is_from_me = false;
+    //$my_idとfrom_user_idが一致する場合
+    if ($dm_data['from_user_id'] === $my_id) {
+        $is_from_me = true;
+    }
+    //$my_idとto_user_idが一致する場合
+    if ($dm_data['to_user_id'] === $my_id) {
+        $is_from_me = false;
+    }
+
+
+    //default_params
+    $default_params = [
+        'parent_id' => 0,
+    ];
+
+    $params = array_merge($default_params, $params);
+
+
+    $fields = [
+        'dm.*',
+        'tou.name AS to_user_name',
+    ];
+
+    $join = '';
+
+    //from_user_idが自分の場合
+    if (!$is_from_me) {
+        //相手のID：to_user_idでJOINする
+        /** @noinspection PhpUndefinedFunctionInspection */
+        $join = db_quote(" LEFT JOIN ?:community_profiles AS tou ON dm.to_user_id = tou.user_id");
+    } else {
+        //相手のID：from_user_idでJOINする
+        /** @noinspection PhpUndefinedFunctionInspection */
+        $join = db_quote(" LEFT JOIN ?:community_profiles AS tou ON dm.from_user_id = tou.user_id");
+    }
+
+
+    /** @noinspection PhpUndefinedFunctionInspection */
+    $condition = db_quote(" AND dm.direct_mail_id = ?i", $direct_mail_id);
+
+    //$params['parent_id']がある場合
+    if ($params['parent_id']) {
+        /** @noinspection PhpUndefinedFunctionInspection */
+        $condition .= db_quote(" AND dm.parent_id = ?i", $params['parent_id']);
+    }
+
+    /** @noinspection PhpUndefinedConstantInspection */
+//    if (AREA === 'C') {
+//        /** @noinspection PhpUndefinedFunctionInspection */
+//        $condition .= db_quote(" AND dm.from_user_id = ?i", Tygh::$app['session']['auth']['user_id']);
+//    }
+
+    $fields = implode(',', $fields);
+
+    /** @noinspection PhpUndefinedFunctionInspection */
+    $direct_mail_data = db_get_row("SELECT ?p FROM ?:community_direct_mails AS dm ?p WHERE 1 ?p", $fields, $join, $condition);
+
+    //to_userの画像を取得
+    fn_bbcmm_get_image_pairs($to_user_id, ['community_profile'], $direct_mail_data);
+
+
+    return $direct_mail_data;
+}
+
+
 //親投稿のデータを整形する
 function fn_bbcmm_format_post(&$parent_post, $ogp = true)
 {

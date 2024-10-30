@@ -69,13 +69,11 @@
         {/if}
 
         {*DM送信*}
-        <a href="{"community.send_dm?user_id=`$cp_data.user_id`"|fn_url}"
-           class="bba-community-send-dm-btn cm-ajax cm-post" data-user-id="{$cp_data.user_id}">
+        <a href="{"community_dm.send_dm?to_user_id=`$cp_data.user_id`"|fn_url}"
+           class="bba-community-send-dm-btn">
             <i class="ty-icon-mail"></i>
             <span>{__("bba_com.send_dm")}</span>
         </a>
     </div>
 
-
-    {*    {$relationship_data|fn_print_r}*}
 </div>
