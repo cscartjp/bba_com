@@ -119,6 +119,11 @@
                 </div>
             </div>
 
+            {*タグ tagsアドオン*}
+            {include file="addons/bba_com/views/community/components/object_tags.tpl" object=$cp_data input_name="cp_data" allow_save=true object_type="U" object_id=$user_data.user_id}
+
+            
+
             {*その他画像 3つ*}
             <div class="control-group">
                 <label class="control-label"

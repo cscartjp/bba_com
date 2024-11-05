@@ -25,6 +25,13 @@ function fn_bbcmm_get_my_community_info($redirect = true)
     /** @noinspection PhpUndefinedFunctionInspection */
     $cp_data = db_get_row("SELECT * FROM ?:community_profiles WHERE user_id = ?i", $auth['user_id']);
 
+    //タグ
+    [$tags] = fn_get_tags(array(
+        'object_type' => 'U',
+        'object_id' => $auth['user_id']
+    ));
+    $cp_data['tags'] = $tags;
+
 
     //ブログスタートがセットされていない場合
     if ($redirect && !isset($cp_data['blog_start'])) {
@@ -94,6 +101,8 @@ function fn_bbcmm_search_community_profiles($params = [], int $items_per_page = 
     $fields = ['cp.*'];
 
     $condition = '1';
+    $join = '';
+    $group_by = '';
 
     //自分のユーザーIDを除外する
     /** @noinspection PhpUndefinedFunctionInspection */
@@ -105,8 +114,27 @@ function fn_bbcmm_search_community_profiles($params = [], int $items_per_page = 
         $condition .= db_quote(" AND cp.name LIKE ?l", '%' . trim($params['cq']) . '%');
     }
 
-    $join = '';
-    $group_by = '';
+    ////tagがある場合?:tagsからデータを取得する
+    if ($params['tag']) {
+        /** @noinspection PhpUndefinedFunctionInspection */
+        $tag_id = db_get_field("SELECT tag_id FROM ?:tags WHERE tag = ?s", $params['tag']);
+
+        //$tag_idが存在しない場合は、空の配列を返す
+        if (!$tag_id) {
+            return [[], $params];
+        }
+
+        //$tag_idがある場合、?:tag_linksテーブルからobject_typeがU（ユーザー）のobject_idを取得する
+        /** @noinspection PhpUndefinedFunctionInspection */
+        $user_ids = db_get_fields("SELECT object_id FROM ?:tag_links WHERE tag_id = ?i AND object_type = ?s", $tag_id, 'U');
+        
+        //object_idsがある場合、?:community_profilesテーブルからuser_idがobject_idsに含まれるものを取得する
+        if ($user_ids) {
+            /** @noinspection PhpUndefinedFunctionInspection */
+            $condition .= db_quote(" AND cp.user_id IN (?a)", $user_ids);
+        }
+    }
+
 
     // ソート順
     $sortings = [
@@ -121,13 +149,19 @@ function fn_bbcmm_search_community_profiles($params = [], int $items_per_page = 
     $limit = '';
     if (!empty($params['items_per_page'])) {
         /** @noinspection PhpUndefinedFunctionInspection */
-        $params['total_items'] = db_get_field("SELECT COUNT(*) FROM ?:community_profiles AS cp WHERE ?p", $condition);
+        $params['total_items'] = db_get_field("SELECT COUNT(*) FROM ?:community_profiles AS cp ?p WHERE ?p", $join, $condition);
         /** @noinspection PhpUndefinedFunctionInspection */
         $limit = db_paginate($params['page'], $params['items_per_page']);
     }
 
     /** @noinspection PhpUndefinedFunctionInspection */
-    $community_profiles = db_get_array("SELECT $fields FROM ?:community_profiles AS cp WHERE ?p ?p ?p", $condition, $group_by, $sorting, $limit);
+    $community_profiles = db_get_array("SELECT $fields FROM ?:community_profiles AS cp ?p WHERE ?p ?p ?p", $join, $condition, $group_by, $sorting, $limit);
+
+    //$community_profilesをforeachで回し、user_idが1以上のものを取得する。またnameが空のものは除外する
+    $community_profiles = array_filter($community_profiles, static function ($community_profile) {
+        return $community_profile['user_id'] > 0 && $community_profile['name'];
+    });
+
 
     //プロフィールアイコン取得
     $community_profile_images = [];
@@ -137,6 +171,14 @@ function fn_bbcmm_search_community_profiles($params = [], int $items_per_page = 
         $community_profile_images[$community_profile['user_id']] = fn_get_image_pairs($community_profile['user_id'], 'community_profile', 'M', true, true, CART_LANGUAGE);
         $community_profile['profile_image'] = $community_profile_images[$community_profile['user_id']];
     }
+
+
+//    if (defined('DEVELOPMENT')) {
+//        fn_lcjp_dev_notify([
+//            $community_profiles, $params
+//        ]);
+//    }
+
 
     return [$community_profiles, $params];
 }
