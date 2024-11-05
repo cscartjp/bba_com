@@ -49,6 +49,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         fn_bbcmm_attach_image_pairs($user_id, $object_types);
 
 
+        //タグを保存
+        if (!empty($profile_data['tags'])) {
+            fn_update_tags(array(
+                'object_type' => 'U',
+                'object_id' => $user_id,
+                'values' => $profile_data['tags']
+            ), true);
+        }
+
+
         //セッションをリセットする $auth['cp_data']
         $auth = &Tygh::$app['session']['auth'];
         unset($auth['cp_data']);
@@ -301,6 +311,7 @@ if ($mode === 'my_profile') {
     $cp_data = fn_bbcmm_get_my_community_info();
     ////////////////////////////////////////////////////////////////////////
 
+
     Tygh::$app['view']->assign('cp_data', $cp_data);
 
 
@@ -354,6 +365,12 @@ if ($mode === 'view_user') {
         return [CONTROLLER_STATUS_NO_PAGE];
     }
 
+    //タグ
+    [$tags] = fn_get_tags(array(
+        'object_type' => 'U',
+        'object_id' => $params['user_id']
+    ));
+    $cp_data['tags'] = $tags;
 
     //このユーザーのcompany_idを取得
     /** @noinspection PhpUndefinedFunctionInspection */
@@ -416,6 +433,13 @@ if ($mode === 'edit_profile') {
     /** @noinspection PhpUndefinedFunctionInspection */
     $user_data = fn_get_user_info($auth['user_id']);
 
+    //タグ
+    [$tags] = fn_get_tags(array(
+        'object_type' => 'U',
+        'object_id' => $user_data['user_id']
+    ));
+    $cp_data['tags'] = $tags;
+
     Tygh::$app['view']->assign('cp_data', $cp_data);
     Tygh::$app['view']->assign('user_data', $user_data);
 
@@ -454,6 +478,41 @@ if ($mode === 'friends') {
     fn_add_breadcrumb(__('bba_com.community_friends'));
 }
 
+if ($mode === 'users') {
+
+    //ログインしていない場合はログインページへ
+    if (empty($auth['user_id'])) {
+        /** @noinspection PhpUndefinedConstantInspection */
+        return array(CONTROLLER_STATUS_REDIRECT, 'auth.login_form?return_url=' . urlencode(Registry::get('config.current_url')));
+    }
+
+    $params = $_REQUEST;
+//    $params['search_all'] = true;
+
+    //$paramsをサニタイズ
+    SecurityHelper::sanitizeObjectData('community_user_posts', $params);
+
+    //自分のデータを取得////////////////////////////////////////////////////
+    $cp_data = fn_bbcmm_get_my_community_info();
+    ////////////////////////////////////////////////////////////////////////
+    Tygh::$app['view']->assign('cp_data', $cp_data);
+
+
+    //自分を対象外
+    $params['my_user_id'] = $auth['user_id'];
+
+    
+    //人物の検索結果を取得
+    [$people, $search] = fn_bbcmm_search_community_profiles($params, 999);
+
+    Tygh::$app['view']->assign('people', $people);
+    Tygh::$app['view']->assign('search', $search);
+
+    /** @noinspection PhpUndefinedFunctionInspection */
+    fn_add_breadcrumb(__('bba_com.community_home'), 'community.home');
+    /** @noinspection PhpUndefinedFunctionInspection */
+    fn_add_breadcrumb(__('bba_com.users'));
+}
 
 //search
 if ($mode === 'search') {

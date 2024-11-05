@@ -541,3 +541,11 @@ msgstr "件名"
 msgctxt "Languages::bba_com.community_res_message_ph"
 msgid "返信メッセージを入力"
 msgstr "返信メッセージを入力"
+
+msgctxt "Languages::bba_com.tags"
+msgid "タグ"
+msgstr "タグ"
+
+msgctxt "Languages::bba_com.users"
+msgid "メンバー一覧"
+msgstr "メンバー一覧"

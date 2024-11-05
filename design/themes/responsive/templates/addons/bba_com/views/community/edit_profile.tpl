@@ -107,6 +107,10 @@
                           class="ty-input-textarea">{$cp_data.my_profile}</textarea>
             </div>
 
+
+            {*タグ tagsアドオン*}
+            {include file="addons/bba_com/views/community/components/object_tags.tpl" object=$cp_data input_name="profile_data" allow_save=true object_type="U" object_id=$user_data.user_id}
+
             {*その他画像 3つ*}
             <div class="ty-control-group">
                 <label for="other_images"
