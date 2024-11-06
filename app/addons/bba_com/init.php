@@ -8,8 +8,7 @@ if (!defined('BOOTSTRAP')) {
     die('Access denied');
 }
 
-///** @noinspection PhpUndefinedFunctionInspection */
-//fn_register_hooks(
-//    'PHP_HOOK_NAME1',
-//    'PHP_HOOK_NAME2'
-//);
+/** @noinspection PhpUndefinedFunctionInspection */
+fn_register_hooks(
+    'get_addons_mail_tpl'
+);

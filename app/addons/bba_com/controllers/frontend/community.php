@@ -98,6 +98,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $op_relationship_id = db_query("INSERT INTO ?:community_relationships ?e", $_friend_data_op);
 
 
+        //友達追加通知
+        fn_bbcmm_send_friend_request_notify($friend_id, $user_id);
+
+
         /** @noinspection PhpUndefinedFunctionInspection */
         fn_set_notification('N', __('notice'), __('bba_com.friend_added'));
 
@@ -130,8 +134,22 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
             /** @noinspection PhpUndefinedFunctionInspection */
             db_query("INSERT INTO ?:community_user_post_likes ?e", $_like_data);
+
+
+//            //logに保存
+//            //FIXME ログに保存////////////////////////////
+//            $update_log = [
+//                'url' => 'like',
+//                'data' => $post_id,
+//                'response' => $user_id,
+//            ];
 //            /** @noinspection PhpUndefinedFunctionInspection */
-//            fn_set_notification('N', __('notice'), __('bba_com.like_added'));
+//            fn_log_event('requests', 'http', $update_log);
+//            //FIXME ログに保存////////////////////////////
+
+
+            //メールで通知
+            fn_bbcmm_send_like_notify($post_id);
         }
 
         //追加後のいいね数を取得
@@ -196,7 +214,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         return [CONTROLLER_STATUS_REDIRECT, $redirect_url];
     }
 
-
     //add_new_comment
     if ($mode === 'add_new_comment') {
 
@@ -209,8 +226,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             'timestamp' => date('Y-m-d H:i:s'),
         ];
 
-        //データのサニタイズ
-//        SecurityHelper::sanitizeObjectData('newsletter', $_post_data);
+        //TODO データのサニタイズ
+        SecurityHelper::sanitizeObjectData('community_user_posts', $_post_data);
 
         //データベースに保存
         /** @noinspection PhpUndefinedFunctionInspection */
@@ -219,6 +236,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         if ($post_id) {
             /** @noinspection PhpUndefinedFunctionInspection */
             fn_set_notification('N', __('notice'), __('bba_com.comment_added'));
+
+            //コメントをメールで通知
+            fn_bbcmm_send_comment_notify($user_post_data['parent_id']);
         } else {
             /** @noinspection PhpUndefinedFunctionInspection */
             fn_set_notification('E', __('error'), __('bba_com.comment_not_added'));

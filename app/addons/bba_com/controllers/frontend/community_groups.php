@@ -190,7 +190,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $group_member_id = db_query("INSERT INTO ?:community_group_members ?e", $member_data);
 
         if ($group_member_id) {
-
+            //招待制の場合
             if ($group_type === 'I') {
                 /** @noinspection PhpUndefinedFunctionInspection */
                 fn_set_notification('N', __('notice'), __('bba_com.group_join_request'));
@@ -198,6 +198,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 /** @noinspection PhpUndefinedFunctionInspection */
                 fn_set_notification('N', __('notice'), __('bba_com.group_joined'));
             }
+
+            //TODO: グループの管理者に通知を送る 招待制：Iの場合のみ？
+            $sent = fn_bbcmm_send_group_join_notify($group_id);
+
+
         } else {
             /** @noinspection PhpUndefinedFunctionInspection */
             fn_set_notification('E', __('error'), __('bba_com.group_not_joined'));
@@ -272,9 +277,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     //add_new_post
     if ($mode === 'add_new_post') {
         $user_post_data = $_REQUEST['new_post'];
+        $group_id = $user_post_data['object_id'];
+
         $_post_data = [
             'user_id' => $auth['user_id'],
-            'object_id' => $user_post_data['object_id'],
+            'object_id' => $group_id,
             'post_type' => $user_post_data['post_type'] ?? 'G',
             'article' => $user_post_data['article'],
             'timestamp' => date('Y-m-d H:i:s'),
@@ -288,6 +295,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $post_id = db_query("INSERT INTO ?:community_user_posts ?e", $_post_data);
 
         if ($post_id) {
+
+            //グループに投稿があった場合は、グループメンバーに通知する
+            $sent = fn_bbcmm_send_group_post_notify($group_id, $post_id, $auth['user_id']);
+
             /** @noinspection PhpUndefinedFunctionInspection */
             fn_set_notification('N', __('notice'), __('bba_com.post_added'));
         } else {

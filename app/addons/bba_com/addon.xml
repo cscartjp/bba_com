@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <addon scheme="3.0">
     <id>bba_com</id>
-    <version>0.1.0</version>
+    <version>0.1.2</version>
     <priority>70000</priority>
     <position>0</position>
     <status>active</status>
@@ -176,4 +176,8 @@
         <!--            DROP order_code;-->
         <!--        </item>-->
     </queries>
+    <functions>
+        <item for="install">fn_bbcmm_addon_install</item>
+        <item for="uninstall">fn_bbcmm_addon_uninstall</item>
+    </functions>
 </addon>

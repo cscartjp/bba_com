@@ -11,6 +11,32 @@ if (!defined('BOOTSTRAP')) {
 use Tygh\Registry;
 
 
+/**
+ * メールテンプレートを利用する
+ * fn_set_hook('get_addons_mail_tpl', $tpl_code, $filename);
+ *
+ * @param string $tpl_code
+ * @param string $filename
+ */
+function fn_bba_com_get_addons_mail_tpl(string $tpl_code, string &$filename)
+{
+    $templates = [
+        BBA_NOTIFY_MAIL_TPL_CODE_LIKED,//いいね通知
+        BBA_NOTIFY_MAIL_TPL_CODE_COMMENTED,//コメント通知
+        BBA_NOTIFY_MAIL_TPL_CODE_FRIEND_REQUEST,//友達申請通知
+        BBA_NOTIFY_MAIL_TPL_CODE_GROUP_POST,//グループへの投稿通知
+        BBA_NOTIFY_MAIL_TPL_CODE_GROUP_JOIN,//グループへの参加通知
+        BBA_NOTIFY_MAIL_TPL_CODE_DM,//DM通知
+    ];
+
+    if (!in_array($tpl_code, $templates, true)) {
+        return;
+    }
+
+    $filename = Registry::get('config.dir.addons') . 'bba_com/tpl_variants/' . $tpl_code . '.php';
+}
+
+
 //自分のコミュニティ情報を取得する
 function fn_bbcmm_get_my_community_info($redirect = true)
 {
@@ -544,13 +570,23 @@ function fn_bbcmm_get_group_members(array $params = [], int $items_per_page = 0)
         'cgm.*',
         'cp.name',
         'cp.company_name',
+        'u.email',
     ];
 
     /** @noinspection PhpUndefinedFunctionInspection */
     $join = db_quote(" LEFT JOIN ?:community_profiles AS cp ON cgm.user_id = cp.user_id");
+    //?:usersテーブルをJOINして、メールアドレスを取得する
+    /** @noinspection PhpUndefinedFunctionInspection */
+    $join .= db_quote(" LEFT JOIN ?:users AS u ON cgm.user_id = u.user_id");
 
     /** @noinspection PhpUndefinedFunctionInspection */
     $condition = db_quote("cgm.group_id = ?i", $group_id);
+
+    //exclude_user_idがある場合
+    if ($params['exclude_user_id']) {
+        /** @noinspection PhpUndefinedFunctionInspection */
+        $condition .= db_quote(" AND cgm.user_id != ?i", $params['exclude_user_id']);
+    }
 
     $limit = '';
     if ($params['items_per_page'] > 0) {
@@ -817,4 +853,581 @@ function fn_bbcmm_format_date($date): string
 
     $diff = floor($diff / 12);
     return __('bba_com.years_ago', ['[diff]' => $diff]);
+}
+
+
+////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////
+
+//投稿データを取得する
+function fn_bbcmm_get_user_post_data(int $post_id): array
+{
+    //$post_idから投稿データを取得する ?:community_user_posts
+    $fields = [
+        'up.*',
+        'u.user_id',
+        'u.email',
+        'u.company_id',
+    ];
+    //?:usersテーブルをJOINして、メールアドレスを取得する
+    $join = ' LEFT JOIN ?:users AS u ON up.user_id = u.user_id';
+
+    $condition = '1';
+    /** @noinspection PhpUndefinedFunctionInspection */
+    $condition .= db_quote(" AND up.post_id = ?i", $post_id);
+
+
+    //投稿データを取得する
+    /** @noinspection PhpUndefinedFunctionInspection */
+    return db_get_row("SELECT ?p FROM ?:community_user_posts AS up ?p WHERE ?p", implode(',', $fields), $join, $condition);
+}
+
+
+/**
+ * いいね！をメールで通知する
+ *
+ * @param $user_id
+ * @param $otp
+ *
+ * @return bool
+ * @noinspection PhpUndefinedConstantInspection
+ */
+function fn_bbcmm_send_like_notify($post_id): bool
+{
+
+    $event_dispatcher = Tygh::$app['event.dispatcher'];
+    $storefront = Tygh::$app['storefront'];
+    $storefront_id = $storefront->storefront_id;
+
+    /** @noinspection PhpUndefinedConstantInspection */
+    $lang_code = (AREA === 'A' && !empty($user_data['lang_code'])) ? $user_data['lang_code'] : CART_LANGUAGE;
+
+    $date_format = Registry::get('settings.Appearance.date_format') . ' ' . Registry::get('settings.Appearance.time_format');
+    //投稿データを取得する
+    $post_data = fn_bbcmm_get_user_post_data($post_id);
+
+    //$post_dataがない場合は、falseを返す
+    if (!$post_data) {
+        return false;
+    }
+
+    $post_type = $post_data['post_type'];
+
+    $notify_to = '';
+    //$post_typeごとにnotify_liked_urlを設定する
+    //T: タイムライン、C: コメント G: グループ
+    if ($post_type === 'T') {
+        $notify_to = 'community.TIMELINE?post_id=' . $post_id;
+    } elseif ($post_type === 'C') {
+        $notify_to = 'community.COMMENT?post_id=' . $post_id;
+    } elseif ($post_type === 'G') {
+        $notify_to = 'community.GROUP?post_id=' . $post_id;
+    }
+
+    /** @noinspection PhpUndefinedFunctionInspection */
+    $notify_liked_url = fn_url($notify_to);
+
+
+    //メールで送信する
+    /** @noinspection PhpUndefinedFunctionInspection */
+    $email_data = [
+        'email' => $post_data['email'],
+        'post_id' => $post_id,
+        'post_type' => $post_type,
+        'notify_liked_url' => $notify_liked_url,
+        'lang_code' => $lang_code,
+        'storefront_id' => $storefront_id,
+        'company_id' => $post_data['company_id'],
+        'like_time' => fn_date_format(TIME, $date_format),
+    ];
+
+    // Emailで通知
+    $event_dispatcher->dispatch(
+        BBA_NOTIFY_ID_LIKED,
+        ['email_data' => $email_data]
+    );
+
+    return true;
+}
+
+/**
+ * コメントをメールで通知する
+ *
+ * @param int $post_id The ID of the post for which the comment notification should be sent.
+ *
+ * @return bool Returns true if the notification was successfully sent; false otherwise.
+ */
+function fn_bbcmm_send_comment_notify(int $post_id): bool
+{
+    $event_dispatcher = Tygh::$app['event.dispatcher'];
+    $storefront = Tygh::$app['storefront'];
+    $storefront_id = $storefront->storefront_id;
+
+    /** @noinspection PhpUndefinedConstantInspection */
+    $lang_code = (AREA === 'A' && !empty($user_data['lang_code'])) ? $user_data['lang_code'] : CART_LANGUAGE;
+
+    $date_format = Registry::get('settings.Appearance.date_format') . ' ' . Registry::get('settings.Appearance.time_format');
+    //投稿データを取得する
+    $post_data = fn_bbcmm_get_user_post_data($post_id);
+
+    //$post_dataがない場合は、falseを返す
+    if (!$post_data) {
+        return false;
+    }
+
+    $post_type = $post_data['post_type'];
+
+    $notify_to = '';
+    //$post_typeごとにnotify_liked_urlを設定する
+    //T: タイムライン、C: コメント G: グループ
+    if ($post_type === 'T') {
+        $notify_to = 'community.TIMELINE?post_id=' . $post_id;
+    } elseif ($post_type === 'C') {
+        $notify_to = 'community.COMMENT?post_id=' . $post_id;
+    } elseif ($post_type === 'G') {
+        $notify_to = 'community.GROUP?post_id=' . $post_id;
+    }
+
+    /** @noinspection PhpUndefinedFunctionInspection */
+    $notify_liked_url = fn_url($notify_to);
+
+
+    //メールで送信する
+    /** @noinspection PhpUndefinedFunctionInspection */
+    $email_data = [
+        'email' => $post_data['email'],
+        'post_id' => $post_id,
+        'post_type' => $post_type,
+        'notify_liked_url' => $notify_liked_url,
+        'lang_code' => $lang_code,
+        'storefront_id' => $storefront_id,
+        'company_id' => $post_data['company_id'],
+        'comment_time' => fn_date_format(TIME, $date_format),
+    ];
+
+//    //logに保存
+//    //FIXME ログに保存////////////////////////////
+//    $update_log = [
+//        'url' => 'fn_bbcmm_send_comment_notify',
+//        'data' => var_export($email_data, true),
+//        'response' => var_export($post_data, true),
+//    ];
+//    /** @noinspection PhpUndefinedFunctionInspection */
+//    fn_log_event('requests', 'http', $update_log);
+//    //FIXME ログに保存////////////////////////////
+
+    // Emailで通知
+    $event_dispatcher->dispatch(
+        BBA_NOTIFY_ID_COMMENTED,
+        ['email_data' => $email_data]
+    );
+
+    return true;
+}
+
+//グループへの投稿通知を送信する
+function fn_bbcmm_send_group_post_notify(int $group_id, $post_id, $my_user_id = null): bool
+{
+    $event_dispatcher = Tygh::$app['event.dispatcher'];
+    $storefront = Tygh::$app['storefront'];
+    $storefront_id = $storefront->storefront_id;
+
+    $date_format = Registry::get('settings.Appearance.date_format') . ' ' . Registry::get('settings.Appearance.time_format');
+
+    //投稿データを取得する
+    $post_data = fn_bbcmm_get_user_post_data($post_id);
+
+    //グループデータを取得する
+    $group_data = fn_bbcmm_get_group_data($group_id);
+
+
+    //TODO グループに投稿があった場合は、グループメンバーに通知する
+    //$group_idからグループメンバーを取得
+    $group_member_params = [
+        'group_id' => $group_id,
+        'status' => 'A',
+    ];
+
+    if ($my_user_id) {
+        $group_member_params['exclude_user_id'] = $my_user_id;
+    }
+
+    [$group_members,] = fn_bbcmm_get_group_members($group_member_params);
+    $emails = array_column($group_members, 'email');
+
+    //$emailsがない場合は、falseを返す
+    if (!$emails) {
+        return false;
+    }
+
+    /** @noinspection PhpUndefinedConstantInspection */
+    $lang_code = (AREA === 'A' && !empty($post_data['lang_code'])) ? $post_data['lang_code'] : CART_LANGUAGE;
+
+    /** @noinspection PhpUndefinedFunctionInspection */
+    $notify_group_url = fn_url('community_groups.view&group_id' . $group_id);
+
+    //メールで送信する
+    foreach ($emails as $email) {
+        /** @noinspection PhpUndefinedFunctionInspection */
+        $email_data = [
+            'email' => $email,
+            'group_id' => $group_id,
+            'group_name' => $group_data['group'],
+            'post_id' => $post_id,
+            'notify_group_url' => $notify_group_url,
+            'lang_code' => $lang_code,
+            'storefront_id' => $storefront_id,
+            'company_id' => $post_data['company_id'],
+            'post_time' => fn_date_format(TIME, $date_format),
+            'post_name' => $post_data['name'],
+        ];
+
+        // Emailで通知
+        $event_dispatcher->dispatch(
+            BBA_NOTIFY_ID_GROUP_POST,
+            ['email_data' => $email_data]
+        );
+    }
+    return true;
+}
+
+//user_idからユーザー情報を取得する
+function fn_bbcmm_get_user_info(int $user_id): array
+{
+    $fields = [
+        'cp.*',
+        'u.email',
+        'u.lang_code',
+    ];
+
+    //usersテーブルからメールアドレスを取得する（JOIN）
+    $join = ' LEFT JOIN ?:users AS u ON u.user_id = cp.user_id';
+
+    $condition = '1';
+    /** @noinspection PhpUndefinedFunctionInspection */
+    $condition .= db_quote(" AND cp.user_id = ?i", $user_id);
+
+
+    //    ?:community_profiles
+    /** @noinspection PhpUndefinedFunctionInspection */
+    return db_get_row("SELECT ?p FROM ?:community_profiles AS cp ?p WHERE ?p", implode(',', $fields), $join, $condition);
+}
+
+
+//友達申請をメールで通知する
+//受け取った相手側のメールアドレスと、友達申請を送信したユーザーの情報を取得する
+/**
+ * 友達申請通知を送信する
+ *
+ * @param int $user_id 通知を送信するユーザーのID
+ * @param int $friend_id 友達申請の対象となる友達のID
+ *
+ * @return bool 送信が成功した場合にtrue、失敗した場合にfalseを返す
+ */
+function fn_bbcmm_send_friend_request_notify(int $friend_id, int $user_id): bool
+{
+    $event_dispatcher = Tygh::$app['event.dispatcher'];
+    $storefront = Tygh::$app['storefront'];
+    $storefront_id = $storefront->storefront_id;
+
+    $date_format = Registry::get('settings.Appearance.date_format') . ' ' . Registry::get('settings.Appearance.time_format');
+
+    //ユーザー情報を取得する(申請者)
+    $user_data = fn_bbcmm_get_user_info($user_id);
+
+    //フレンド相手の情報を取得する
+    $friend_data = fn_bbcmm_get_user_info($friend_id);
+
+    /** @noinspection PhpUndefinedConstantInspection */
+    $lang_code = (AREA === 'A' && !empty($friend_data['lang_code'])) ? $friend_data['lang_code'] : CART_LANGUAGE;
+
+
+    //$user_dataまたは$friend_dataがない場合は、falseを返す
+    if (!$user_data || !$friend_data) {
+        return false;
+    }
+
+    //メールで送信する
+    /** @noinspection PhpUndefinedFunctionInspection */
+    $email_data = [
+        'email' => $friend_data['email'],//友達申請を受け取る相手のメールアドレス
+        'friend_id' => $friend_id,//友達申請を受け取る相手のユーザーID
+        'request_sender_name' => $user_data['name'],//友達申請を送信したユーザーの名前
+        'request_sender_user_id' => $user_id,//友達申請を送信したユーザーのユーザーID
+        'notify_friend_request_url' => fn_url('community.friends'),
+        'lang_code' => $lang_code,
+        'storefront_id' => $storefront_id,
+        'company_id' => $user_data['company_id'],
+        'friend_request_time' => fn_date_format(TIME, $date_format),
+        'friend_request_name' => $friend_data['name'],
+    ];
+
+    // Emailで通知
+    $event_dispatcher->dispatch(
+        BBA_NOTIFY_ID_FRIEND_REQUEST,
+        ['email_data' => $email_data]
+    );
+
+    return true;
+}
+
+//TODO グループへの参加通知を送信する(グループタイプがIの場合は管理者：create_user_idに通知)
+function fn_bbcmm_send_group_join_notify(int $group_id): bool
+{
+    $event_dispatcher = Tygh::$app['event.dispatcher'];
+    $storefront = Tygh::$app['storefront'];
+    $storefront_id = $storefront->storefront_id;
+
+    $date_format = Registry::get('settings.Appearance.date_format') . ' ' . Registry::get('settings.Appearance.time_format');
+
+
+    //グループデータを取得する
+    $group_data = fn_bbcmm_get_group_data($group_id);
+    $create_user_id = $group_data['create_user_id'];
+
+    //ユーザー（このグループの管理者）情報を取得する
+    $user_data = fn_bbcmm_get_user_info($create_user_id);
+
+    /** @noinspection PhpUndefinedConstantInspection */
+    $lang_code = (AREA === 'A' && !empty($user_data['lang_code'])) ? $user_data['lang_code'] : CART_LANGUAGE;
+
+    //$user_dataまたは$group_dataがない場合は、falseを返す
+    if (!$user_data || !$group_data) {
+        return false;
+    }
+
+    /** @noinspection PhpUndefinedFunctionInspection */
+    $notify_group_url = fn_url('community_groups.view&group_id' . $group_id);
+
+
+    //メールで送信する
+    /** @noinspection PhpUndefinedFunctionInspection */
+    $email_data = [
+        'email' => $user_data['email'],
+        'group_id' => $group_id,
+        'group_name' => $group_data['group'],
+        'notify_group_url' => $notify_group_url,
+        'user_id' => $create_user_id,
+        'lang_code' => $lang_code,
+        'storefront_id' => $storefront_id,
+        'company_id' => $user_data['company_id'],
+        'group_join_time' => fn_date_format(TIME, $date_format),
+        'group_join_name' => $user_data['name'],
+    ];
+
+    if (defined('DEVELOPMENT')) {
+        fn_lcjp_dev_notify([
+            'email_data ' => $email_data,
+            'group_data' => $group_data,
+            'create_user_id' => $create_user_id,
+            'user_data' => $user_data,
+        ]);
+    }
+
+    // Emailで通知
+    $event_dispatcher->dispatch(
+        BBA_NOTIFY_ID_GROUP_JOIN,
+        ['email_data' => $email_data]
+    );
+
+    return true;
+}
+
+
+//DM通知を送信する
+function fn_bbcmm_send_dm_notify(int $direct_mail_id, array $dm_data): bool
+{
+    $event_dispatcher = Tygh::$app['event.dispatcher'];
+    $storefront = Tygh::$app['storefront'];
+    $storefront_id = $storefront->storefront_id;
+
+    $date_format = Registry::get('settings.Appearance.date_format') . ' ' . Registry::get('settings.Appearance.time_format');
+
+    //DMデータを取得する
+//    $dm_data = fn_bbcmm_get_direct_mail_data($direct_mail_id);
+
+
+    //        `direct_mail_id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT,
+//        `from_user_id` mediumint(8) UNSIGNED NOT NULL,
+//        `to_user_id` mediumint(8) UNSIGNED NOT NULL,
+//        `parent_id` int(11) UNSIGNED NOT NULL DEFAULT '0',
+//        `subject` varchar(128) NOT NULL DEFAULT '',
+//        `message` text NOT NULL DEFAULT '',
+//        `timestamp` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
+//        `status` char(1) NOT NULL DEFAULT 'A',
+
+
+    //DMデータがない場合は、falseを返す
+    if (!$dm_data) {
+        return false;
+    }
+
+    //DMの送信者の情報を取得する
+    $from_user_id = $dm_data['from_user_id'];
+    $to_user_id = $dm_data['to_user_id'];
+
+    $from_user_data = fn_bbcmm_get_user_info($from_user_id);
+    $to_user_data = fn_bbcmm_get_user_info($to_user_id);
+
+    //DMの受信者の情報を取得する
+//    $to_user_id = $dm_data['to_user_id'];
+//    $to_user_data = fn_bbcmm_get_user_info($to_user_id);
+
+    /** @noinspection PhpUndefinedConstantInspection */
+    $lang_code = (AREA === 'A' && !empty($to_user_data['lang_code'])) ? $to_user_data['lang_code'] : CART_LANGUAGE;
+
+    //$from_user_dataまたは$to_user_dataがない場合は、falseを返す
+    if (!$from_user_data || !$to_user_data) {
+        return false;
+    }
+
+    /** @noinspection PhpUndefinedFunctionInspection */
+    $notify_dm_url = fn_url('community_dm.view&direct_mail_id=' . $direct_mail_id);
+
+    //メールで送信する
+    /** @noinspection PhpUndefinedFunctionInspection */
+    $email_data = [
+        'email' => $to_user_data['email'],
+        'direct_mail_id' => $direct_mail_id,
+        'from_user_id' => $from_user_id,
+        'sender_name' => $from_user_data['name'],
+        'to_user_id' => $to_user_id,
+        'lang_code' => $lang_code,
+        'notify_dm_url' => $notify_dm_url,
+        'storefront_id' => $storefront_id,
+        'company_id' => $to_user_data['company_id'],
+        'dm_time' => fn_date_format(TIME, $date_format),
+        'from_user_name' => $from_user_data['name'],
+    ];
+
+    // Emailで通知
+    $event_dispatcher->dispatch(
+        BBA_NOTIFY_ID_DM,
+        ['email_data' => $email_data]
+    );
+
+    return true;
+}
+
+
+////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////
+// インストール時
+function fn_bbcmm_addon_install()
+{
+    //////////////////////////////////////////////
+    //メールテンプレートをインストールする
+    $mail_templates = [];
+    $mail_template_desc = [];
+
+    //メールテンプレートの種類を定義'
+    //いいね通知
+    $mail_templates[] = [
+        'tpl_code' => BBA_NOTIFY_MAIL_TPL_CODE_LIKED
+    ];
+    //コメント通知
+    $mail_templates[] = [
+        'tpl_code' => BBA_NOTIFY_MAIL_TPL_CODE_COMMENTED
+    ];
+    //友達申請通知
+    $mail_templates[] = [
+        'tpl_code' => BBA_NOTIFY_MAIL_TPL_CODE_FRIEND_REQUEST
+    ];
+    //グループへの投稿通知
+    $mail_templates[] = [
+        'tpl_code' => BBA_NOTIFY_MAIL_TPL_CODE_GROUP_POST
+    ];
+    //グループへの参加通知
+    $mail_templates[] = [
+        'tpl_code' => BBA_NOTIFY_MAIL_TPL_CODE_GROUP_JOIN
+    ];
+    //DM通知
+    $mail_templates[] = [
+        'tpl_code' => BBA_NOTIFY_MAIL_TPL_CODE_DM
+    ];
+
+    //メールテンプレートの詳細を定義
+    //いいね通知
+    $mail_template_desc[] = [
+        'tpl_name' => 'いいね通知（アドオン）',
+        'tpl_trigger' => BBA_NOTIFY_MAIL_TPL_TRIGGER_LIKED,
+        'subject' => '【{%SP_NAME%}】いいねがありました',
+        'body_txt' => "いいねがありました。\r\n----------------------------------------\r\n{%BBA_COM_LIKE_URL%}\r\n\r\nなお、このメールに見覚えがない場合は、管理者にご確認ください。",
+    ];
+    //コメント通知
+    $mail_template_desc[] = [
+        'tpl_name' => 'コメント通知（アドオン）',
+        'tpl_trigger' => BBA_NOTIFY_MAIL_TPL_TRIGGER_COMMENTED,
+        'subject' => '【{%SP_NAME%}】コメントがありました',
+        'body_txt' => "コメントがありました。\r\n----------------------------------------\r\n{%BBA_COM_COMMENT_URL%}\r\n\r\nなお、このメールに見覚えがない場合は、管理者にご確認ください。",
+    ];
+    //友達申請通知
+    $mail_template_desc[] = [
+        'tpl_name' => '友達申請通知（アドオン）',
+        'tpl_trigger' => BBA_NOTIFY_MAIL_TPL_TRIGGER_FRIEND_REQUEST,
+        'subject' => '【{%SP_NAME%}】友達申請がありました',
+        'body_txt' => "友達申請がありました。\r\n----------------------------------------\r\n{%BBA_COM_FRIEND_REQUEST_URL%}\r\n\r\nなお、このメールに見覚えがない場合は、管理者にご確認ください。",
+    ];
+    //参加グループへの投稿通知
+    $mail_template_desc[] = [
+        'tpl_name' => '参加グループへの投稿通知（アドオン）',
+        'tpl_trigger' => BBA_NOTIFY_MAIL_TPL_TRIGGER_GROUP_POST,
+        'subject' => '【{%SP_NAME%}】参加グループへの投稿がありました',
+        'body_txt' => "参加グループへの投稿がありました。\r\n----------------------------------------\r\n{%BBA_COM_GROUP_NAME%}\r\n{%BBA_COM_GROUP_URL%}\r\n\r\nなお、このメールに見覚えがない場合は、管理者にご確認ください。",
+    ];
+    //グループへの参加通知
+    $mail_template_desc[] = [
+        'tpl_name' => 'グループへの参加通知（アドオン）',
+        'tpl_trigger' => BBA_NOTIFY_MAIL_TPL_TRIGGER_GROUP_JOIN,
+        'subject' => '【{%SP_NAME%}】グループへの参加がありました',
+        'body_txt' => "グループへの参加がありました。\r\n----------------------------------------\r\n{%BBA_COM_GROUP_NAME%}\r\n{%BBA_COM_GROUP_URL%}\r\n\r\nなお、このメールに見覚えがない場合は、管理者にご確認ください。",
+    ];
+    //DM通知
+    $mail_template_desc[] = [
+        'tpl_name' => 'DM通知（アドオン）',
+        'tpl_trigger' => BBA_NOTIFY_MAIL_TPL_TRIGGER_DM,
+        'subject' => '【{%SP_NAME%}】DMが届きました',
+        'body_txt' => "DMが届きました。\r\n----------------------------------------\r\n{%BBA_COM_DM_SENDER_NAME%}\r\n{%BBA_COM_DM_URL%}\r\n\r\nなお、このメールに見覚えがない場合は、管理者にご確認ください。",
+    ];
+
+    // インストールされた言語を取得
+    /** @noinspection PhpUndefinedFunctionInspection */
+    $languages = db_get_hash_array("SELECT * FROM ?:languages", 'lang_code');
+
+    // メールテンプレートを管理するテーブルにデータをセット
+    $cnt = 0;
+    foreach ($mail_templates as $_data) {
+        /** @noinspection PhpUndefinedFunctionInspection */
+        $tpl_id = db_query("REPLACE INTO ?:jp_mtpl ?e", $_data);
+        foreach ($languages as $lc => $_v) {
+            $mail_template_desc[$cnt]['company_id'] = 1;
+            $mail_template_desc[$cnt]['tpl_id'] = $tpl_id;
+            $mail_template_desc[$cnt]['lang_code'] = $lc;
+            /** @noinspection PhpUndefinedFunctionInspection */
+            db_query("REPLACE INTO ?:jp_mtpl_descriptions ?e", $mail_template_desc[$cnt]);
+        }
+        $cnt++;
+    }
+}
+
+
+// アンインストール時
+function fn_bbcmm_addon_uninstall()
+{
+    //////////////////////////////////////////////
+    //メールテンプレートをアンインストールする
+    $uninstall = [
+        BBA_NOTIFY_MAIL_TPL_CODE_LIKED => BBA_NOTIFY_MAIL_TPL_TRIGGER_LIKED,//いいね通知
+        BBA_NOTIFY_MAIL_TPL_CODE_COMMENTED => BBA_NOTIFY_MAIL_TPL_TRIGGER_COMMENTED,//コメント通知
+        BBA_NOTIFY_MAIL_TPL_CODE_FRIEND_REQUEST => BBA_NOTIFY_MAIL_TPL_TRIGGER_FRIEND_REQUEST,//友達申請通知
+        BBA_NOTIFY_MAIL_TPL_CODE_GROUP_POST => BBA_NOTIFY_MAIL_TPL_TRIGGER_GROUP_POST,//参加グループへの投稿通知
+        BBA_NOTIFY_MAIL_TPL_CODE_GROUP_JOIN => BBA_NOTIFY_MAIL_TPL_TRIGGER_GROUP_JOIN,//グループへの参加通知
+    ];
+    foreach ($uninstall as $key => $value) {
+        /** @noinspection PhpUndefinedFunctionInspection */
+        db_query("DELETE FROM ?:jp_mtpl WHERE tpl_code = ?s", $key);
+        /** @noinspection PhpUndefinedFunctionInspection */
+        db_query("DELETE FROM ?:jp_mtpl_descriptions WHERE tpl_trigger = ?s", $value);
+    }
+    //////////////////////////////////////////////
 }
