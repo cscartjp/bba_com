@@ -549,3 +549,35 @@ msgstr "タグ"
 msgctxt "Languages::bba_com.users"
 msgid "メンバー一覧"
 msgstr "メンバー一覧"
+
+msgctxt "Languages::bba_com.notify_commented_url"
+msgid "コメントURL"
+msgstr "コメントURL"
+
+msgctxt "Languages::bba_com.notify_liked_url"
+msgid "いいね！URL"
+msgstr "いいね！URL"
+
+msgctxt "Languages::bba_com.notify_friend_request_url"
+msgid "友達リクエストURL"
+msgstr "友達リクエストURL"
+
+msgctxt "Languages::bba_com.notify_friend_request_sender_name"
+msgid "友達リクエスト送信者名"
+msgstr "友達リクエスト送信者名"
+
+msgctxt "Languages::bba_com.notify_group_url"
+msgid "グループURL"
+msgstr "グループURL"
+
+msgctxt "Languages::bba_com.notify_group_name"
+msgid "グループ名"
+msgstr "グループ名"
+
+msgctxt "Languages::bba_com.notify_dm_url"
+msgid "ダイレクトメールURL"
+msgstr "ダイレクトメールURL"
+
+msgctxt "Languages::bba_com.notify_dm_sender_name"
+msgid "DM送信者"
+msgstr "DM送信者"

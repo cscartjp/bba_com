@@ -76,6 +76,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         /** @noinspection PhpUndefinedFunctionInspection */
         $direct_mail_id = db_query("INSERT INTO ?:community_direct_mails ?e", $_data);
 
+
+        //TODO DM送信通知を送る
+        $sent = fn_bbcmm_send_dm_notify($direct_mail_id, $_data);
+
+
         //DM送信完了メッセージを表示
         /** @noinspection PhpUndefinedFunctionInspection */
         fn_set_notification('N', __('notice'), __('bba_com.direct_mail_sent'));
@@ -91,10 +96,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     //send_dm_res(返信を送る)
     if ($mode === 'send_dm_res') {
 
-        die(fn_print_r([
-            $mode,
-            $params
-        ]));
+//        die(fn_print_r([
+//            $mode,
+//            $params
+//        ]));
 
 
         //送信相手の情報
@@ -105,6 +110,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             /** @noinspection PhpUndefinedConstantInspection */
             return [CONTROLLER_STATUS_NO_PAGE];
         }
+
+
+        //TODO DM送信通知を送る
+//        $sent = fn_bbcmm_send_dm_notify($direct_mail_id, $_data);
 
         //送信相手の情報を取得
         //ユーザーデータを取得

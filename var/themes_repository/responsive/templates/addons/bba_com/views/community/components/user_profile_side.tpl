@@ -1,5 +1,16 @@
 <div class="bba-profile-info">
     <ul>
+        {*タグ*}
+        {if $cp_data.tags}
+            <li>
+                <span class="bba-profile-info-label">{__("bba_com.tags")}</span>
+                <span class="bba-profile-info-value">
+                    {include file="addons/bba_com/views/community/components/tags.tpl" object_type="U" object_id=$cp_data.user_id object=$cp_data}
+                </span>
+            </li>
+        {/if}
+
+
         {*会社名*}
         {if $cp_data.company_name}
             <li>
